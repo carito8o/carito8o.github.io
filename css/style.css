@@ -47,11 +47,6 @@ body.preloader .scroll-progress {
 .panel-5 { background: linear-gradient(135deg, #8f9e6b, #4f8339); color: #fff; }
 .panel-6 { background: linear-gradient(135deg, #0a0a0a 0%, #0f1f0f 100%); color: #fff; }
 
-html, body, .panel, #main {                                 /* En navegadores como SAFARI, se agrega un padding, entonces esto es para que no afecte */
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-top: env(safe-area-inset-top);
-}
-
 /* ======================== SECCION INICIO (SEC1) ======================== */
 
 .background-clip { /* VIDEO DE FONDO */
@@ -253,5 +248,6 @@ html, body, .panel, #main {                                 /* En navegadores co
   .page-border {border: 7px solid}
 
 }
+
 
 
