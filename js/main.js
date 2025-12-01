@@ -46,6 +46,7 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
     if (next === current || isAnimating) return;
     isAnimating = true;
 
+    updateVH();                                                            // Recalcular --vh justo antes de calcular la altura estable
     const stableHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh')) * 100;
     const targetY = -next * stableHeight;                                  // Calculamos la posición Y a la que debe moverse el contenedor
 
@@ -164,6 +165,7 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   }
   
   function onResize() {
+    updateVH();                                                   // recalcula ahora mismo
     const stableHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh')) * 100; // Reconstruye el equivalente a 100vh REAL multiplicando la unidad 1vh corregida (--vh) por 100
     gsap.set(main, { y: -current * stableHeight });
   }
@@ -173,6 +175,8 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   // --------------------------------------------------------------------------
 
   function init() {
+
+    updateVH();                                                   // asegurar valor actualizado al crear layout
 
     // Inicializa posiciones y barra
     gsap.set(main, { y: 0 });
@@ -227,3 +231,4 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   window.getCurrentSection = () => current;
 
 })();
+
