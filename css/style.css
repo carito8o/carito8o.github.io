@@ -208,10 +208,13 @@ body.preloader .scroll-progress {
 
 /* ======================== PAGE BORDER ======================== */
 .page-border {
-  display: none !important;
+  position: fixed;                                          /* Siempre visible, fija en pantalla */
+  inset: 0px;                                               /* Ocupa toda la pantalla */
+  border: 10px solid white;                               /* Marco blanco alrededor */
+  background: transparent;                                  /* Sin relleno */
+  pointer-events: none;                                     /* No bloquea clics ni scroll */
+  z-index: 9999;
 }
-
-
 
 /* ======================== BARRA DE PROGRESO ======================== */
 .scroll-progress {
@@ -244,6 +247,7 @@ body.preloader .scroll-progress {
   .page-border {border: 7px solid}
 
 }
+
 
 
 
