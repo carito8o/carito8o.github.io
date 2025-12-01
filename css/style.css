@@ -128,13 +128,8 @@ body.preloader .scroll-progress {
 }
 
 /* ======================== NAVBAR ======================== */
-.navbar {                                                   /* siempre visible */
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);                              /* centrado horizontalmente */
-  z-index: 10;
-}
+.navbar { display: none !important; }
+
 
 .navbar ul { 
   display: flex;                                            /* elementos en línea */
@@ -208,13 +203,9 @@ body.preloader .scroll-progress {
 
 /* ======================== PAGE BORDER ======================== */
 .page-border {
-  position: fixed;                                          /* Siempre visible, fija en pantalla */
-  inset: 0px;                                               /* Ocupa toda la pantalla */
-  border: 10px solid white;                               /* Marco blanco alrededor */
-  background: transparent;                                  /* Sin relleno */
-  pointer-events: none;                                     /* No bloquea clics ni scroll */
-  z-index: 9999;
+  display: none !important;
 }
+
 
 /* ======================== BARRA DE PROGRESO ======================== */
 .scroll-progress {
@@ -247,6 +238,7 @@ body.preloader .scroll-progress {
   .page-border {border: 7px solid}
 
 }
+
 
 
 
