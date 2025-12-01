@@ -149,6 +149,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transform: translateZ(0);                         /* para que se vea el fondo del panel en celulares */
 
 
   background: hsla(0, 0%, 0%, .1);                 /* Negro transparente */
@@ -390,4 +391,5 @@
     height: clamp(25px, 5.5vw, 40px);
     font-size: clamp(0.9rem, 2.8vw, 1.2rem);
   }
+
 }
