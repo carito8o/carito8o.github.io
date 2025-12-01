@@ -32,12 +32,22 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   // NAVEGACIÓN ENTRE SECCIONES
   // --------------------------------------------------------------------------
 
+  // Aunque en este proyecto solo usamos el 100% (pantalla completa), se usa el 1% para mantener flexibilidad si en el futuro queremos calcular otros 
+  // valores (como 50vh, 120vh, etc.) usando la misma variable
+  function updateVH() {                                                    // vh significa Viewport Height
+    const vh = window.innerHeight * 0.01;                                  // Obtiene el 1% de la altura visible real del dispositivo para conseguir la unidad '1vh' corregida
+    document.documentElement.style.setProperty('--vh', `${vh}px`);         // Guarda este valor como la variable CSS global --vh
+  }
+  updateVH();
+
+
   function goTo(idx) {
     const next = Math.max(0, Math.min(total - 1, idx));                    // Forzamos que "next" nunca sea menor a 0 ni mayor al total
     if (next === current || isAnimating) return;
     isAnimating = true;
 
-    const targetY = -next * window.innerHeight;                            // Calculamos la posición Y a la que debe moverse el contenedor
+    const stableHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh')) * 100;
+    const targetY = -next * stableHeight;                                  // Calculamos la posición Y a la que debe moverse el contenedor
 
     gsap.to(main, {                                                        // Animación del movimiento del contenedor
       y: targetY,
@@ -70,7 +80,7 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   function handleVideoVisibility() {
     if (!video1) return;
     video1.muted = true;
-    video1.setAttribute("muted", "");
+    video1.setAttribute("muted", "");      // Agrega el atributo HTML `muted` al video. Safari iOS exige que el atributo exista en el HTML
 
 
     // Video de fondo → solo se reproduce en la sección 1
@@ -80,13 +90,15 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
     // Videos de la sección 3 → solo se reproducen si estamos en sección 3
     const svcVids = document.querySelectorAll("#sec3 .servicios__video");
 
-    svcVids.forEach(v => {
+    if (svcVids.length > 0) {
+      svcVids.forEach(v => {
         v.muted = true;                    // siempre muteado
         v.setAttribute("muted", "");       // compatibilidad 100% móvil
 
         if (current === 2) v.play().catch(() => {});
         else v.pause();
-    });
+      });
+    }
   }
 
   // --------------------------------------------------------------------------
@@ -152,7 +164,8 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   }
   
   function onResize() {
-    gsap.set(main, { y: -current * window.innerHeight });
+    const stableHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh')) * 100; // Reconstruye el equivalente a 100vh REAL multiplicando la unidad 1vh corregida (--vh) por 100
+    gsap.set(main, { y: -current * stableHeight });
   }
 
   // --------------------------------------------------------------------------
@@ -170,10 +183,16 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchend", onTouchEnd, { passive: true });
     window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("resize", onResize);
+    window.addEventListener("resize", () => {
+      updateVH();
+      onResize();
+    });
 
     window.addEventListener("orientationchange", () => {          // Para cuando se gira el celular
-      setTimeout(onResize, 400);                                  // Espera 400ms y luego ejecuta onResize()
+      setTimeout(() => {
+        updateVH();
+        onResize();
+      }, 400);                                                    // Espera 400ms y luego actualiza altura y ejecuta onResize()
     });
 
     wireNavLinks();
