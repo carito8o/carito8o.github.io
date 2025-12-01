@@ -1,0 +1,271 @@
+/* ================= SECCIÓN SERVICIOS ================= */
+#sec3 {
+  padding: 5rem 0 3rem;                                     /* espacio arriba y abajo */
+}
+
+#sec3 h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;                                      /* espacio entre "Servicios" y videos */
+}
+
+
+/* ---------- Contenedor general ---------- */
+#sec3 .servicios__contenedor {
+  display: grid;
+  grid-template-columns: 1fr 1fr;                           /* Dos columnas en escritorio, mitad y mitad */
+  min-height: 75vh;
+}
+
+/* ---------- Columna ---------- */
+#sec3 .servicios__col {
+  position: relative;                                       /* Necesario para posicionar el texto */
+  overflow: hidden;
+  perspective: 1000px;                                      /* ayuda a la estabilidad del render... no es 3D, pero fuerza a que el navegador trabaje mejor */
+  display: flex;
+  align-items: stretch;                                     /* para que video llene su columna verticalmente si es posible */
+  min-height: 45vh;
+}
+
+/* ---------- Video ---------- */
+#sec3 .servicios__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;                                        /* Cubre toda el área sin deformarse */
+  transform: translateZ(0) scale(1.02);                     /* Empuja a la GPU + leve zoom */
+  transition: transform 0.6s ease;
+  will-change: transform, filter;
+  max-height: 100%;                                         /* evita que se sobredimensione */
+  aspect-ratio: 16/9;                                       /* Mantiene proporción */
+}
+
+
+/* ---------- Texto sobre video ---------- */
+#sec3 .servicios__texto {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  text-align: center;
+  background: rgba(0, 0, 0, 0.45);
+  padding: clamp(0.6rem, 2vw, 1.5rem) clamp(0.8rem, 3vw, 2rem);
+  border-radius: 0.6rem;
+  width: min(86%, 600px);                                   /* Máximo 600px */
+  opacity: 0.9;
+
+  clip-path: inset(0 30% 0 30% round 0.6rem);
+  transition:
+    clip-path 0.8s cubic-bezier(0.25, 1, 0.3, 1),
+    transform 0.6s cubic-bezier(0.25, 1, 0.3, 1),
+    background 0.4s ease;
+  pointer-events: none;
+  will-change: clip-path, transform;
+
+  font-size: clamp(0.9rem, 1.2vw + 0.5vh, 1.2rem);
+}
+
+#sec3 .servicios__texto h2 {
+  font-size: clamp(1rem, 2.2vw + 0.6vh, 2rem);
+  margin-bottom: 0.4rem;
+  color: #7ED957;
+  letter-spacing: 1px;
+}
+
+#sec3 .servicios__texto p {
+  font-size: clamp(0.8rem, 1vw + 0.3vh, 1rem);
+  line-height: 1.5;
+  color: #eee;
+  opacity: 0;                                               /* Invisible por defecto */
+  max-height: 0;                                            /* Contraído */
+  overflow: hidden;                                         /* Oculta texto */
+  transition: opacity 0.4s ease, max-height 0.5s ease;
+}
+
+/* --- Hint “Toca para ver más” --- */
+#sec3 .servicios__hint {
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(0.8rem, 1.6vw, 0.95rem);
+  color: rgba(255, 255, 255, 0.8);
+  opacity: 1;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+
+/* --- Hover para escritorio --- */
+@media (hover: hover) and (pointer: fine) {
+  /* ------------ Hover normal SOLO SI JS lo habilita ------------ */
+  body.hover-enabled #sec3 .servicios__col:hover .servicios__video {
+    transform: scale(1.05);
+  }
+
+  body.hover-enabled #sec3 .servicios__col:hover .servicios__texto {
+    background: rgba(0, 0, 0, 0.65);
+    clip-path: inset(0 0 0 0 round 0.6rem);                   /* máscara abierta */
+    transform: translate(-50%, -50%) scale(1.02);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  body.hover-enabled #sec3 .servicios__col:hover .servicios__texto p {
+    opacity: 1;
+    max-height: 200px;
+  }
+
+  body.hover-enabled #sec3 .servicios__col:hover .servicios__hint {
+    opacity: 0;                                               /* desaparece al hacer hover */
+  }
+
+  /* ------------ Hover bloqueado (antes del primer movimiento) ------------ */
+  .servicios__col.no-hover:hover .servicios__texto {
+    clip-path: inset(0 30% 0 30% round 0.6rem) !important;    /* máscara cerrada */
+    transform: translate(-50%, -50%) scale(0.95) !important;
+    background: rgba(0, 0, 0, 0.45) !important;
+  }
+
+  .servicios__col.no-hover:hover .servicios__texto p {
+    opacity: 0 !important;
+    max-height: 0 !important;
+  }
+
+  .servicios__col.no-hover:hover .servicios__hint {
+    opacity: 1 !important;
+  }
+
+}
+
+/* --- Estado activo táctil --- */
+#sec3 .servicios__col.servicio-activo .servicios__texto p {
+  opacity: 1;
+  max-height: 200px;
+}
+
+#sec3 .servicios__col.servicio-activo .servicios__hint {
+  opacity: 0;
+}
+
+@media screen and (max-width: 1024px) {
+  #sec3 .servicios__contenedor {
+    grid-template-columns: 1fr;                             /* Cambia a una sola columna */
+  }
+
+  #sec3 .servicios__col {
+    min-height: 40vh;
+  }
+
+  #sec3 .servicios__texto {
+    top: auto;
+    bottom: 14%;
+    left: 50%;
+    clip-path: none !important;
+    transform: translateX(-50%) scale(1) !important;
+    background: rgba(0, 0, 0, 0.5);
+    padding: clamp(0.6rem, 2vw, 1rem);
+    width: 85%;
+    max-width: none;
+    pointer-events: auto;                                   /* permite recibir taps */
+    transition:
+      opacity 0.5s ease,
+      background 0.6s ease,
+      transform 0.5s ease,
+      padding 0.5s ease;
+  }
+
+  #sec3 .servicios__texto h2 {
+    font-size: clamp(1rem, 3vw, 2.5rem);
+  }
+
+  #sec3 .servicios__texto p {
+    opacity: 0;
+    max-height: 0;
+    font-size: clamp(1rem, 3vw, 2.5rem);
+    overflow: hidden;
+    transition: opacity 0.4s ease, max-height 0.5s ease;
+  }
+
+  #sec3 .servicios__hint {
+    display: block;                                         /* se muestra el hint en móviles */
+    top: 89%;
+    font-size: clamp(0.3rem, 2.3vw, 1.8rem);
+  }
+
+  #sec3 .servicios__col.servicio-activo .servicios__texto {
+    bottom: 5%;
+    width: 92%;
+    padding: 1rem 1.2rem;
+    background: rgba(0, 0, 0, 0.65);                      /* ligeramente más oscuro para contraste */
+    transition: all 0.4s ease;
+  }
+
+  #sec3 .servicios__col.servicio-activo .servicios__texto h2 {
+    font-size: clamp(1rem, 3vw, 2.5rem);
+  }
+
+  #sec3 .servicios__col.servicio-activo .servicios__texto p {
+    font-size: clamp(1rem, 3vw, 2.5rem);
+    line-height: 1.6;
+    max-height: none;
+    opacity: 1;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  #sec3 {
+    padding: 0.5rem 0;
+  }
+
+  #sec3 h1 {
+    display: none;                                          /* Oculta el título grande */
+  }
+
+  #sec3 .servicios__col {
+    min-height: 43vh !important;
+  }
+
+  #sec3 .servicios__texto {
+    bottom: 10%;
+    padding: 0.6rem 0.9rem;
+    clip-path: none !important;
+    transform: translateX(-50%) scale(1) !important;
+    width: 92%;
+  }
+  #sec3 .servicios__hint {
+    top: 91%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  #sec3 .servicios__col {
+    height: 34vh;
+  }
+
+  #sec3 .servicios__texto {
+    bottom: 10%;
+    padding: 0.5rem 0.8rem;
+  }
+  #sec3 .servicios__hint {
+    font-size: clamp(0.8rem, 2.8vw, 2.3rem);
+  }
+}
+
+
+/* ====================================== SOLO SI CAMBIO DE VIDEO A GIF... sino borrar ============================================ */
+
+/* Contenedor del video/gif */
+.service-video {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem; /* separación con el texto */
+}
+
+/* Imagen/gif dentro */
+.service-video img {
+  width: 100%;
+  max-width: 400px;   /* límite máximo para que no se hagan gigantes */
+  height: auto;
+  border-radius: 8px; /* opcional: esquinas redondeadas */
+}

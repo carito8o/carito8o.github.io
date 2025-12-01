@@ -1,0 +1,250 @@
+import { cardsHTML } from "../template/cards-template.js";
+import { tieneGPUReal } from "../utilidades/detectarGPU.js";
+
+export function initSec5() {
+
+  const contenedorTarjetas = document.getElementById("cards-container");
+
+  // Si el contenedor existe, inserta el HTML de las tarjetas
+  if (contenedorTarjetas) {
+    contenedorTarjetas.innerHTML = cardsHTML;
+  }
+
+  // SISTEMA TÁCTIL (TOUCH) — abrir / cerrar tarjetas en móviles -------------------------------------------------------------------------
+
+  const isTouch = window.matchMedia("(pointer: coarse)").matches;
+
+  if (isTouch) {
+
+    const tarjetas = document.querySelectorAll("#sec5 .card__article");
+
+    let tarjetaAbierta = null;                       // Guarda cuál tarjeta está abierta
+    let ultimoToque = 0;                             // Guarda el tiempo del último toque (para distinguir click de touch)
+    const TOUCH_DELAY = 700;                         // Retraso para diferenciar entre un "touch" real y el "click fantasma" que generan los móviles
+
+    const cerrarTarjeta = tarjeta => {
+      if (!tarjeta) return;
+      tarjeta.classList.remove("show-info");         // Oculta la información (descripcion y redes)
+      tarjetaAbierta = null;                         // Ninguna tarjeta queda abierta
+    };
+
+    const abrirTarjeta = tarjeta => {
+      if (!tarjeta) return;
+      if (tarjetaAbierta && tarjetaAbierta !== tarjeta) cerrarTarjeta(tarjetaAbierta); // Si había otra tarjeta abierta, se cierra primero
+      
+      tarjeta.classList.add("show-info");
+      tarjetaAbierta = tarjeta;                                                        // Guardamos cuál está abierta ahora
+    };
+
+    // Controla si abrir o cerrar al tocar
+    const activate = (evento, tarjeta) => {
+
+      if (evento.type === "click" && Date.now() - ultimoToque < TOUCH_DELAY) return;   // Si llega un click inmediatamente después de un touch, lo ignoramos
+
+      if (evento.target.closest(".info__link")) return;                                // Si se tocó un enlace dentro de la tarjeta, no abrir/cerrar
+
+      if (tarjetaAbierta === tarjeta) return cerrarTarjeta(tarjeta);                   // Si la tarjeta ya estaba abierta, se cierra
+
+      abrirTarjeta(tarjeta);                                                           // Si no estaba abierta, se abre
+    };
+
+    // Asignamos los eventos táctiles y de click a cada tarjeta
+    tarjetas.forEach(tarjeta => {
+      
+      tarjeta.addEventListener(
+        "touchend",
+        (e) => {
+          ultimoToque = Date.now();                                                    // Registra el momento del toque
+          if (!e.target.closest(".info__link")) e.preventDefault();                    // Evita que el navegador simule un click después del toque
+          activate(e, tarjeta);                                                        // Activar abrir/cerrar
+        },
+        { passive: false }
+      );
+
+      // Aunque esto es código táctil, los móviles generan un "click" después del touch. Lo escuchamos para poder bloquear ese click fantasma dentro de activate().
+      tarjeta.addEventListener("click", (e) => activate(e, tarjeta));
+    });
+
+    const sec5 = document.querySelector("#sec5");
+
+    if (sec5) {
+      // tocar afuera de una tarjeta → cerrar
+      sec5.addEventListener("click", e => {
+        if (!e.target.closest(".card__article")) {
+          cerrarTarjeta(tarjetaAbierta);
+        }
+      });
+
+      // salir de la sección → cerrar
+      new IntersectionObserver(([entry]) => {
+        if (!entry.isIntersecting) cerrarTarjeta(tarjetaAbierta);
+      }, { threshold: 0.1 }).observe(sec5);
+    }
+  }
+
+  // EFECTO 3D EN ESCRITORIO (INCLINACIÓN + REFLEJO) -------------------------------------------------------------------------
+
+  const tieneHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;  // detecta si hay mouse (no tactil)
+  
+  if (!tieneHover) return;
+
+  const selectorTarjetas = "#sec5 .card__article";
+  const contenedorTilt =
+    document.getElementById("cards-container") ||
+    document.querySelector("#sec5 .card__container") ||
+    document.querySelector("#sec5");
+
+  if (!contenedorTilt) return;
+
+  function wrapTilt(tarjeta) {                                                         // Crea un contenedor interno ("wrapper") para aplicar transformaciones 3D. Evita que el contenido interno se deforme
+
+    if (tarjeta.querySelector(".tilt-wrapper")) return tarjeta.querySelector(".tilt-wrapper");  // Si ya existe el wrapper, lo devolvemos
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "tilt-wrapper";
+
+    while (tarjeta.firstChild) wrapper.appendChild(tarjeta.firstChild);                // Metemos todo el contenido original dentro del wrapper
+    tarjeta.appendChild(wrapper);
+
+    return wrapper;
+  }
+
+  function activarInclinacion3D(tarjeta) {                                             // Activa el efecto 3D en una tarjeta específica
+    
+    if (!tarjeta || tarjeta.dataset.inclinacionActiva === "true") return;              // Evita activar dos veces el efecto en la misma tarjeta
+    tarjeta.dataset.inclinacionActiva = "true";
+
+    const wrapper = wrapTilt(tarjeta);                                                 // Creamos el contenedor interno para el 3D
+
+    let reflejoBrillante = wrapper.querySelector(".reflejo-brillante");                // Buscar o crear el reflejo luminoso
+
+    if (!reflejoBrillante) {
+      reflejoBrillante = document.createElement("div");
+      reflejoBrillante.className = "reflejo-brillante";
+      wrapper.appendChild(reflejoBrillante);
+    }
+
+    const ROTACION_MAXIMA = 20;                                                        // Grados máximos de inclinación
+    const PROFUNDIDAD_Z = 30;                                                          // Separación desde la pantalla (efecto de profundidad)
+    let idAnimacion = null;                                                            // Para evitar animaciones acumuladas
+
+    function onMove(e) {
+      if (e.target.closest(".info__link, .info a, .info button")) return;              // Si el mouse pasa por encima de un enlace → no mover la tarjeta
+
+      const rect = tarjeta.getBoundingClientRect();                                    // Medidas y posición de la tarjeta
+
+      // Posición del mouse
+      const cx = e.clientX;
+      const cy = e.clientY;
+      if (cx == null || cy == null) return;
+
+      // Convertir posición del mouse en valores -1 a 1
+      const dx = (cx - (rect.left + rect.width / 2)) / (rect.width / 2);
+      const dy = (cy - (rect.top + rect.height / 2)) / (rect.height / 2);
+
+      // Calcular rotaciones basadas en dirección del mouse
+      const rotY = -dx * ROTACION_MAXIMA;
+      const rotX = dy * -ROTACION_MAXIMA;
+
+      // Posición del reflejo
+      const gx = ((dx + 1) / 2) * 100;
+      const gy = ((dy + 1) / 2) * 100;
+
+      if (idAnimacion) cancelAnimationFrame(idAnimacion);                              // Cancelar animación previa para evitar lag
+      
+      idAnimacion = requestAnimationFrame(() => {
+        tarjeta.style.transform = `translateZ(${PROFUNDIDAD_Z}px) rotateX(${rotX}deg) rotateY(${rotY}deg)`; // Aplicamos transformaciones 3D
+
+        // Ubicamos el reflejo
+        reflejoBrillante.style.left = `${gx}%`;
+        reflejoBrillante.style.top = `${gy}%`;
+        reflejoBrillante.style.opacity = "1";
+        reflejoBrillante.style.transform = `translate(-50%, -50%) rotate(45deg) scale(1)`;
+      });
+    }
+
+    function onLeave() {
+      if (idAnimacion) cancelAnimationFrame(idAnimacion);
+      idAnimacion = requestAnimationFrame(() => {
+        tarjeta.style.transform = "";                                                  // Volver al estado original
+        reflejoBrillante.style.opacity = "0";                                          // Ocultar reflejo
+        reflejoBrillante.style.left = "50%";
+        reflejoBrillante.style.top = "50%";
+      });
+    }
+
+    // Activamos eventos de mouse
+    tarjeta.addEventListener("mousemove", onMove, { passive: true });
+    tarjeta.addEventListener("mouseleave", onLeave, { passive: true });
+  }
+
+  function initExistingCards() {
+    // Activa el efecto 3D en todas las tarjetas ya existentes
+    document.querySelectorAll(selectorTarjetas).forEach(activarInclinacion3D);
+  }
+
+  initExistingCards();
+
+  const observadorCambios = new MutationObserver((mutaciones) => {
+    mutaciones.forEach((m) => {
+      m.addedNodes.forEach((nodo) => {
+        if (!(nodo instanceof HTMLElement)) return;
+
+        if (nodo.matches && nodo.matches(selectorTarjetas)) activarInclinacion3D(nodo);
+        if (nodo.querySelectorAll) nodo.querySelectorAll(selectorTarjetas).forEach(activarInclinacion3D);
+      });
+    });
+  });
+
+  observadorCambios.observe(contenedorTilt, { childList: true, subtree: true });
+
+  window.addEventListener("load", initExistingCards);                                  // Asegura que si algo se cargó tarde, se aplique el efecto también
+
+
+  /* ================================================ Fondo dependiendo el GPU ================================================ */
+
+  /* ===========  MODO FULL O LITE? =========== */
+
+  const isGPU = tieneGPUReal();                                                        // Llama a la función global → true si hay GPU real, false si es CPU o WebGL lento
+
+  if (!isGPU) {                                                                        // Si NO hay aceleración → activar modo LITE
+    document.body.classList.add("sec5-lite");
+
+    // Desactiva por completo la burbuja interactiva del fondo en LITE
+    const bubble = document.querySelector("#sec5 .interactive");
+    if (bubble) bubble.remove();
+
+  } else {
+    document.body.classList.remove("sec5-lite");                                       // Si hay GPU real → asegurar que esta en modo FULL
+  }
+
+  /* =========== ANIMACIÓN DE LA BURBUJA INTERACTIVA (solo modo FULL) =========== */
+
+  window.addEventListener("DOMContentLoaded", () => {
+    if (!isGPU) return;
+
+    const bubble = document.querySelector("#sec5 .interactive");                       // Elemento que se mueve siguiendo el mouse
+    const sec5 = document.querySelector("#sec5");                                      // Contenedor de la sección (usado para calcular posiciones)
+
+    if (!bubble || !sec5) return;
+
+    let curX = 0, curY = 0;                                                            // Posición actual de la burbuja
+    let targetX = 0, targetY = 0;                                                      // Posición hacia donde la burbuja debe moverse
+
+    function animateBubble() {
+      curX += (targetX - curX) / 20;                                                   // Lerp → mueve un 5% hacia el objetivo en X                   // targetX - curX → distancia hasta el objetivo
+      curY += (targetY - curY) / 20;                                                   // Lerp → mueve un 5% hacia el objetivo en Y                   // / 20 → significa “moverse un 5% cada frame” (1/20 = 0.05)
+      bubble.style.transform = `translate(${curX}px, ${curY}px)`;                      // Actualiza la posición visual de la burbuja
+      requestAnimationFrame(animateBubble);                                            // Repite la animación cada frame del navegador
+    }
+
+    window.addEventListener("mousemove", (e) => {
+      const rect = sec5.getBoundingClientRect();                                       // Tamaño y posición de la sección en pantalla
+      targetX = e.clientX - (rect.left + rect.width / 2);                              // Calcula desplazamiento horizontal desde el centro de sec5
+      targetY = e.clientY - (rect.top + rect.height / 2);                              // Calcula desplazamiento vertical desde el centro de sec5
+    });
+
+    animateBubble();                                                                   // Inicia la animación continua
+  });
+
+}
