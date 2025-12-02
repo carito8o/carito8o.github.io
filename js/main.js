@@ -42,6 +42,11 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
 
 
   function goTo(idx) {
+
+    // Cerrar modal de correos inmediatamente cuando empieza el cambio de seccion
+    const modal = document.getElementById("mail-modal");
+    if (modal) modal.style.display = "none";
+    
     const next = Math.max(0, Math.min(total - 1, idx));                    // Forzamos que "next" nunca sea menor a 0 ni mayor al total
     if (next === current || isAnimating) return;
     isAnimating = true;
@@ -231,4 +236,5 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   window.getCurrentSection = () => current;
 
 })();
+
 
