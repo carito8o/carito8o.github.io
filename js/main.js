@@ -111,36 +111,49 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   // DETECTAR ZOOM HECHO POR EL USUARIO EN MOVILES
   // --------------------------------------------------------------------------
 
-  function checkZoom() {
-  const zoomed = window.visualViewport && window.visualViewport.scale !== 1;
+  function enableZoomMode() {
+  if (document.body.classList.contains("zoom-mode")) return;
 
-  if (zoomed && !document.body.classList.contains("zoom-mode")) {
-    document.body.classList.add("zoom-mode");
+  document.body.classList.add("zoom-mode");
 
-    // Cancelar cualquier animación pendiente
-    gsap.killTweensOf("#main");
+  // parar animaciones
+  gsap.killTweensOf("#main");
 
-    // Reset posición
-    gsap.set("#main", { y: 0 });
+  // reset transforms
+  gsap.set("#main", { y: 0 });
+  main.style.transform = "none";
 
-    // Permitir scroll natural
-    document.body.style.overflow = "auto";
-  }
+  // permitir scroll natural
+  document.body.style.overflow = "auto";
+}
 
-  if (!zoomed && document.body.classList.contains("zoom-mode")) {
-    document.body.classList.remove("zoom-mode");
+function disableZoomMode() {
+  if (!document.body.classList.contains("zoom-mode")) return;
 
-    // Restaurar comportamiento GSAP
-    document.body.style.overflow = "hidden";
-    updateVH();
-    onResize();
+  document.body.classList.remove("zoom-mode");
+
+  // volver a bloquear scroll nativo porque usamos navegación GSAP
+  document.body.style.overflow = "hidden";
+
+  updateVH();
+  onResize();  // reposiciona la sección correctamente
+}
+
+function monitorZoom() {
+  const scale = window.visualViewport?.scale || 1;
+
+  if (scale !== 1) {
+    enableZoomMode();
+  } else {
+    disableZoomMode();
   }
 }
 
 if (window.visualViewport) {
-  visualViewport.addEventListener("resize", checkZoom);
-  visualViewport.addEventListener("scroll", checkZoom);
+  visualViewport.addEventListener("resize", monitorZoom);
+  visualViewport.addEventListener("scroll", monitorZoom);
 }
+
 
 
   // --------------------------------------------------------------------------
@@ -272,6 +285,7 @@ if (window.visualViewport) {
   window.getCurrentSection = () => current;
 
 })();
+
 
 
 
