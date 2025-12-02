@@ -45,6 +45,10 @@ export function initSec6() {
   }, { threshold: 0.6 });
 
   observer.observe(section);
+
+  document.getElementById("phone-number").addEventListener("click", () => {                 // Para que se copie el número cuando se toque o se le de clic
+    navigator.clipboard.writeText("+57 300 123 4567");
+  });
 }
 
 //   MODAL DE CONTACTO (EMAIL) ===============================================================================
@@ -113,3 +117,4 @@ document.querySelectorAll(".mail-options button").forEach(btn => {
     modal.style.display = "none";                                                           // Oculta el modal después de elegir una opción
   });
 });
+
