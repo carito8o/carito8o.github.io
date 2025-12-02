@@ -46,9 +46,33 @@ export function initSec6() {
 
   observer.observe(section);
 
-  document.getElementById("phone-number").addEventListener("click", () => {                 // Para que se copie el número cuando se toque o se le de clic
-    navigator.clipboard.writeText("+57 304 302 1622");
-  });
+  // Copiar teléfono y mostrar notificación -------------------------
+
+  const phoneEl = document.getElementById("phone-number");
+
+  if (phoneEl) {
+    phoneEl.addEventListener("click", () => {
+      navigator.clipboard.writeText("+57 304 302 1622").then(() => {                        // Copiar y luego...
+
+        // Buscamos si ya existe una notificación previa
+        let notiTel = document.querySelector(".copy-notiTel");
+        if (!notiTel) {
+          notiTel = document.createElement("div");
+          notiTel.className = "copy-notiTel";                                               // Le asignamos la clase CSS que define su estilo
+          notiTel.textContent = "Número copiado";
+          document.body.appendChild(notiTel);                                               // Lo agregamos al final del <body> para que se superponga visualmente
+        }
+
+        // Mostrar animación
+        notiTel.classList.add("show");
+
+        // Ocultar después de 2s
+        setTimeout(() => {
+          notiTel.classList.remove("show");
+        }, 2000);
+      });
+    });
+  }
 }
 
 //   MODAL DE CONTACTO (EMAIL) ===============================================================================
@@ -117,5 +141,6 @@ document.querySelectorAll(".mail-options button").forEach(btn => {
     modal.style.display = "none";                                                           // Oculta el modal después de elegir una opción
   });
 });
+
 
 
