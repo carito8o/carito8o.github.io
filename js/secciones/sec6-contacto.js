@@ -47,7 +47,7 @@ export function initSec6() {
   observer.observe(section);
 
   document.getElementById("phone-number").addEventListener("click", () => {                 // Para que se copie el número cuando se toque o se le de clic
-    navigator.clipboard.writeText("+57 300 123 4567");
+    navigator.clipboard.writeText("+57 304 302 1622");
   });
 }
 
@@ -117,4 +117,5 @@ document.querySelectorAll(".mail-options button").forEach(btn => {
     modal.style.display = "none";                                                           // Oculta el modal después de elegir una opción
   });
 });
+
 
