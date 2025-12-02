@@ -84,26 +84,29 @@ export function initSec5() {
 
   // EFECTO 3D EN ESCRITORIO (INCLINACIÓN + REFLEJO) -------------------------------------------------------------------------
 
-  const tieneHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;  // detecta si hay mouse (no tactil)
+  const tieneHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;  // Comprueba si hay cursor preciso y soporta hover → indica que es PC con mouse
   
-  if (!tieneHover) return;
+  if (tieneHover) {
 
   const selectorTarjetas = "#sec5 .card__article";
-  const contenedorTilt =
-    document.getElementById("cards-container") ||
-    document.querySelector("#sec5 .card__container") ||
-    document.querySelector("#sec5");
+  const contenedorTilt =                                                               // Busca el contenedor donde existen o se insertarán las tarjetas
+    document.getElementById("cards-container") ||                                      // 1) Intenta obtener por ID directo
+    document.querySelector("#sec5 .card__container") ||                                // 2) Alternativamente por un contenedor interno
+    document.querySelector("#sec5");                                                   // 3) Último recurso: toda la sección sec5
 
-  if (!contenedorTilt) return;
+  if (!contenedorTilt) {
+    console.warn("Sec5: contenedor para efecto tilt no encontrado");
+
+  } else {
 
   function wrapTilt(tarjeta) {                                                         // Crea un contenedor interno ("wrapper") para aplicar transformaciones 3D. Evita que el contenido interno se deforme
 
-    if (tarjeta.querySelector(".tilt-wrapper")) return tarjeta.querySelector(".tilt-wrapper");  // Si ya existe el wrapper, lo devolvemos
+    if (tarjeta.querySelector(".tilt-wrapper")) return tarjeta.querySelector(".tilt-wrapper");  // Si la tarjeta ya tiene un wrapper creado, lo devuelve para no duplicar
 
     const wrapper = document.createElement("div");
-    wrapper.className = "tilt-wrapper";
+    wrapper.className = "tilt-wrapper";                                                // Le asigna la clase CSS necesaria para transformaciones 3D
 
-    while (tarjeta.firstChild) wrapper.appendChild(tarjeta.firstChild);                // Metemos todo el contenido original dentro del wrapper
+    while (tarjeta.firstChild) wrapper.appendChild(tarjeta.firstChild);                // Mientras la tarjeta tenga elementos hijos, los mueve dentro del wrapper
     tarjeta.appendChild(wrapper);
 
     return wrapper;
@@ -199,6 +202,8 @@ export function initSec5() {
   observadorCambios.observe(contenedorTilt, { childList: true, subtree: true });
 
   window.addEventListener("load", initExistingCards);                                  // Asegura que si algo se cargó tarde, se aplique el efecto también
+  }
+  }
 
 
   /* ================================================ Fondo dependiendo el GPU ================================================ */
@@ -213,38 +218,60 @@ export function initSec5() {
     // Desactiva por completo la burbuja interactiva del fondo en LITE
     const bubble = document.querySelector("#sec5 .interactive");
     if (bubble) bubble.remove();
-
-  } else {
-    document.body.classList.remove("sec5-lite");                                       // Si hay GPU real → asegurar que esta en modo FULL
+    return;
   }
 
   /* =========== ANIMACIÓN DE LA BURBUJA INTERACTIVA (solo modo FULL) =========== */
 
-  window.addEventListener("DOMContentLoaded", () => {
-    if (!isGPU) return;
+  document.body.classList.remove("sec5-lite");                                         // Hay GPU real → asegurar que esta en modo FULL
 
-    const bubble = document.querySelector("#sec5 .interactive");                       // Elemento que se mueve siguiendo el mouse
-    const sec5 = document.querySelector("#sec5");                                      // Contenedor de la sección (usado para calcular posiciones)
+  const bubble = document.querySelector("#sec5 .interactive");                         // Elemento que se mueve siguiendo el mouse
+  const sec5 = document.querySelector("#sec5");                                        // Contenedor de la sección (usado para calcular posiciones)
 
-    if (!bubble || !sec5) return;
+  if (bubble && sec5) {                                                                // Solo si ambos existen...
 
     let curX = 0, curY = 0;                                                            // Posición actual de la burbuja
     let targetX = 0, targetY = 0;                                                      // Posición hacia donde la burbuja debe moverse
+    let running = false;                                                               // Estado de si la animación está activa o no
+    let mouseTracking = false;                                                         // Controla si respondemos al movimiento del mouse
 
     function animateBubble() {
+      if (!running) return;                                                            // Si la animación no está activa, detiene el loop
+
       curX += (targetX - curX) / 20;                                                   // Lerp → mueve un 5% hacia el objetivo en X                   // targetX - curX → distancia hasta el objetivo
       curY += (targetY - curY) / 20;                                                   // Lerp → mueve un 5% hacia el objetivo en Y                   // / 20 → significa “moverse un 5% cada frame” (1/20 = 0.05)
-      bubble.style.transform = `translate(${curX}px, ${curY}px)`;                      // Actualiza la posición visual de la burbuja
+      bubble.style.transform = `translate(${curX}px, ${curY}px)`;                      // Actualiza estilo CSS para mover la burbuja visualmente
       requestAnimationFrame(animateBubble);                                            // Repite la animación cada frame del navegador
     }
 
-    window.addEventListener("mousemove", (e) => {
-      const rect = sec5.getBoundingClientRect();                                       // Tamaño y posición de la sección en pantalla
-      targetX = e.clientX - (rect.left + rect.width / 2);                              // Calcula desplazamiento horizontal desde el centro de sec5
-      targetY = e.clientY - (rect.top + rect.height / 2);                              // Calcula desplazamiento vertical desde el centro de sec5
+    function enable() {                                                                // Activa el modo animado al entrar en la sección
+      if (running) return;                                                             // Si ya está activo, no lo repite
+      running = true;
+      mouseTracking = true;
+      animateBubble();
+    }
+
+    function disable() {                                                               // Desactiva la animación al salir de la sección
+      running = false;
+      mouseTracking = false;
+      bubble.style.transform = "";                                                     // Resetea posición visual de la burbuja
+    }
+
+    // Activación por cambio de sección
+    window.addEventListener("sectionChange", (e) => {
+      const active = e.detail.current === 4;                                           // sec5 = index 4
+      if (active) enable();                                                            // Entra → activa animación
+      else disable();                                                                  // Sale → detiene animación
     });
 
-    animateBubble();                                                                   // Inicia la animación continua
-  });
 
+    window.addEventListener("mousemove", (e) => {
+      if (!mouseTracking) return;                                                      // Si la burbuja no está activa → no hacemos nada
+
+      const rect = sec5.getBoundingClientRect();                                       // Tamaño y posición de la sección en pantalla
+      targetX = e.clientX - (rect.left + rect.width / 2);                              // Calcula desplazamiento horizontal desde el centro de sec5
+      targetY = e.clientY - (rect.top + rect.height / 2);                              // Igual para vertical
+    });
+  }
 }
+
