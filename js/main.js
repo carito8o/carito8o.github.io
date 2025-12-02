@@ -108,6 +108,42 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   }
 
   // --------------------------------------------------------------------------
+  // DETECTAR ZOOM HECHO POR EL USUARIO EN MOVILES
+  // --------------------------------------------------------------------------
+
+  function checkZoom() {
+  const zoomed = window.visualViewport && window.visualViewport.scale !== 1;
+
+  if (zoomed && !document.body.classList.contains("zoom-mode")) {
+    document.body.classList.add("zoom-mode");
+
+    // Cancelar cualquier animación pendiente
+    gsap.killTweensOf("#main");
+
+    // Reset posición
+    gsap.set("#main", { y: 0 });
+
+    // Permitir scroll natural
+    document.body.style.overflow = "auto";
+  }
+
+  if (!zoomed && document.body.classList.contains("zoom-mode")) {
+    document.body.classList.remove("zoom-mode");
+
+    // Restaurar comportamiento GSAP
+    document.body.style.overflow = "hidden";
+    updateVH();
+    onResize();
+  }
+}
+
+if (window.visualViewport) {
+  visualViewport.addEventListener("resize", checkZoom);
+  visualViewport.addEventListener("scroll", checkZoom);
+}
+
+
+  // --------------------------------------------------------------------------
   // EVENTOS DE NAVEGACIÓN
   // --------------------------------------------------------------------------
 
@@ -236,5 +272,6 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   window.getCurrentSection = () => current;
 
 })();
+
 
 
