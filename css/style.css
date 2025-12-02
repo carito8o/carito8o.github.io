@@ -251,18 +251,19 @@ body.preloader .scroll-progress {
 /* ======================== PARA QUE EL ZOOM DEL USUARIO NO AFECTE EN MOVILES ======================== */
 
 body.zoom-mode {
-  overflow-y: auto;
+  overflow-y: auto !important;
 }
 
 body.zoom-mode #main {
   transform: none !important;        /* cancela GSAP */
-  height: auto;
+  height: auto !important;
 }
 
 body.zoom-mode .panel {
-  height: auto;                      /* permite contenido fluido */
-  min-height: 100vh;                 /* garantiza secciones "normales" */
+  height: auto !important;                      /* permite contenido fluido */
+  min-height: 100vh !important;                 /* garantiza secciones "normales" */
 }
+
 
 
 
