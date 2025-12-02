@@ -108,55 +108,6 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   }
 
   // --------------------------------------------------------------------------
-  // DETECTAR ZOOM HECHO POR EL USUARIO EN MOVILES
-  // --------------------------------------------------------------------------
-
-  function enableZoomMode() {
-  if (document.body.classList.contains("zoom-mode")) return;
-
-  document.body.classList.add("zoom-mode");
-
-  // parar animaciones
-  gsap.killTweensOf("#main");
-
-  // reset transforms
-  gsap.set("#main", { y: 0 });
-  main.style.transform = "none";
-
-  // permitir scroll natural
-  document.body.style.overflow = "auto";
-}
-
-function disableZoomMode() {
-  if (!document.body.classList.contains("zoom-mode")) return;
-
-  document.body.classList.remove("zoom-mode");
-
-  // volver a bloquear scroll nativo porque usamos navegación GSAP
-  document.body.style.overflow = "hidden";
-
-  updateVH();
-  onResize();  // reposiciona la sección correctamente
-}
-
-function monitorZoom() {
-  const scale = window.visualViewport?.scale || 1;
-
-  if (scale !== 1) {
-    enableZoomMode();
-  } else {
-    disableZoomMode();
-  }
-}
-
-if (window.visualViewport) {
-  visualViewport.addEventListener("resize", monitorZoom);
-  visualViewport.addEventListener("scroll", monitorZoom);
-}
-
-
-
-  // --------------------------------------------------------------------------
   // EVENTOS DE NAVEGACIÓN
   // --------------------------------------------------------------------------
 
@@ -285,6 +236,7 @@ if (window.visualViewport) {
   window.getCurrentSection = () => current;
 
 })();
+
 
 
 
