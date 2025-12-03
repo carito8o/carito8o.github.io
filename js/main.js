@@ -235,7 +235,67 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   window.goToSection = goTo;
   window.getCurrentSection = () => current;
 
+  // ----------------------------------------------
+// PINCH DETECTOR + BLOQUEO DE NAVEGACIÓN GSAP
+// ----------------------------------------------
+
+let activePointers = 0;
+let isPinching = false;
+
+// Evita navega durante pinch
+function isNavigationBlocked() {
+  return isPinching === true;
+}
+
+// Wrap de goTo para bloquearlo temporalmente
+const originalGoTo = window.goToSection;
+window.goToSection = function(index) {
+  if (isNavigationBlocked()) return;     // bloquea cambios de sección
+  originalGoTo(index);
+};
+
+// Detectar pointers (dedos en pantalla)
+window.addEventListener("pointerdown", (e) => {
+  activePointers++;
+
+  if (activePointers >= 2 && !isPinching) {
+    isPinching = true;
+
+    // Bloquear animación mientras esté pinch
+    gsap.killTweensOf("#main");
+
+    // Evitar que el sistema trate de navegar
+    window.removeEventListener("wheel", onWheel, { passive: false });
+    window.removeEventListener("touchend", onTouchEnd, { passive: true });
+  }
+});
+
+window.addEventListener("pointerup", finishPinch);
+window.addEventListener("pointercancel", finishPinch);
+window.addEventListener("pointerout", finishPinch);
+
+function finishPinch() {
+  activePointers = Math.max(0, activePointers - 1);
+
+  if (activePointers < 2 && isPinching) {
+    isPinching = false;
+
+    // Restaurar listeners bloqueados
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+
+    // Realinear inmediatamente a la sección actual
+    setTimeout(() => {
+      updateVH();
+      const stableHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh')) * 100;
+      gsap.set(main, { y: -window.getCurrentSection() * stableHeight });
+    }, 10);
+  }
+}
+
+
 })();
+
 
 
 
