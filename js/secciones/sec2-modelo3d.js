@@ -142,6 +142,9 @@ export function initSec2() {
     if (!isVisible) return;
     animationId = requestAnimationFrame(animate);
 
+      // Bloquea interacción si está colapsado
+      controls.enabled = expanded;
+
     // Render continuo si el contenedor está expandido
     if (expanded || activeRender) {
       controls.update();
@@ -388,5 +391,6 @@ export function initSec2() {
   document.addEventListener("sectionChange", () => {
     document.body.classList.remove("disable-snap");
   });
+
 
 }
