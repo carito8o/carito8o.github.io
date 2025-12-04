@@ -237,7 +237,17 @@ body.preloader .scroll-progress {
   border-radius: 5px;
   transition: width 0.2s linear;                            /* Animación suave al actualizar */
 }
+/* ================================================ */
 
+/* Evita movimiento del scroll mientras el zoom está inestable */
+.viewport-lock * {
+  pointer-events: none !important;
+}
+
+.viewport-lock {
+  touch-action: none !important;
+  overflow: hidden !important;
+}
 
 /* ======================== RESPONSIVE GLOBAL ======================== */
 @media (max-width: 768px) {
@@ -247,6 +257,7 @@ body.preloader .scroll-progress {
   .page-border {border: 7px solid}
 
 }
+
 
 
 
