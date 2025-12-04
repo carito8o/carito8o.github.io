@@ -174,6 +174,56 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
     const stableHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh')) * 100; // Reconstruye el equivalente a 100vh REAL multiplicando la unidad 1vh corregida (--vh) por 100
     gsap.set(main, { y: -current * stableHeight });
   }
+  // ================================================
+  // FIX PARA ZOOM EN MÓVILES — Viewport Guardian
+  // ================================================
+  (() => {
+
+    let lastKnownHeight = window.innerHeight;
+    let viewportIsLocked = false;
+    let lockTimeout = null;
+
+    function lockViewport() {
+      if (!viewportIsLocked) {
+        viewportIsLocked = true;
+        document.body.classList.add("viewport-lock");
+      }
+
+      clearTimeout(lockTimeout);
+      lockTimeout = setTimeout(() => {
+        viewportIsLocked = false;
+        document.body.classList.remove("viewport-lock");
+        restoreViewport();
+      }, 350); // Safari tarda entre 120-300ms en estabilizar después de zoom
+    }
+
+    function restoreViewport() {
+      // Recalcular vh corregido
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+
+      // Reconstruir altura total
+      const stableHeight =
+        parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--vh")) * 100;
+
+      // Reposicionar main exactamente a la sección actual
+      gsap.set(document.getElementById("main"), {
+        y: -window.getCurrentSection() * stableHeight
+      });
+    }
+
+    // Monitoreo continuo del viewport
+    setInterval(() => {
+      const newHeight = window.innerHeight;
+
+      // Si el viewport cambia sin ser un resize oficial → es zoom
+      if (Math.abs(newHeight - lastKnownHeight) > 10) {
+        lastKnownHeight = newHeight;
+        lockViewport();
+      }
+    }, 60);
+
+  })();
 
   // --------------------------------------------------------------------------
   // INICIALIZACIÓN
@@ -236,6 +286,7 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   window.getCurrentSection = () => current;
 
 })();
+
 
 
 
