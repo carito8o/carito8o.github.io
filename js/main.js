@@ -22,25 +22,8 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   let isAnimating = false;
   let touchStartY = 0;                                                   // Guarda el punto inicial del toque en pantallas táctiles
 
-  // FLAG que usan los handlers para desacoplar navegación durante zoom/estabilización
-  window.__viewportLock = false;
 
-  // --------------------------------------------------------------------------
-  // UTILIDAD: VH CORREGIDO
-  // --------------------------------------------------------------------------
-  function updateVH() {                                                    // vh significa Viewport Height
-    const vh = window.innerHeight * 0.01;                                  // Obtiene el 1% de la altura visible real del dispositivo
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-  }
-  updateVH();
-
-  function getStableHeight() {
-    return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh')) * 100;
-  }
-
-  // --------------------------------------------------------------------------
-  // HELPER: ¿snap desactivado?
-  // --------------------------------------------------------------------------
+  // Detecta si el scroll-snap está desactivado (lo usa la sección 3D)
   function isSnapDisabled() {
     return document.body.classList.contains("disable-snap");
   }
@@ -48,9 +31,17 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   // --------------------------------------------------------------------------
   // NAVEGACIÓN ENTRE SECCIONES
   // --------------------------------------------------------------------------
-  function goTo(idx) {
 
-    if (window.__viewportLock) return;                                     // Si viewport bloqueado → no navegar
+  // Aunque en este proyecto solo usamos el 100% (pantalla completa), se usa el 1% para mantener flexibilidad si en el futuro queremos calcular otros 
+  // valores (como 50vh, 120vh, etc.) usando la misma variable
+  function updateVH() {                                                    // vh significa Viewport Height
+    const vh = window.innerHeight * 0.01;                                  // Obtiene el 1% de la altura visible real del dispositivo para conseguir la unidad '1vh' corregida
+    document.documentElement.style.setProperty('--vh', `${vh}px`);         // Guarda este valor como la variable CSS global --vh
+  }
+  updateVH();
+
+
+  function goTo(idx) {
 
     // Cerrar modal de correos inmediatamente cuando empieza el cambio de seccion
     const modal = document.getElementById("mail-modal");
@@ -61,22 +52,23 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
     isAnimating = true;
 
     updateVH();                                                            // Recalcular --vh justo antes de calcular la altura estable
-    const stableHeight = getStableHeight();
+    const stableHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh')) * 100;
     const targetY = -next * stableHeight;                                  // Calculamos la posición Y a la que debe moverse el contenedor
 
-    // Animación
-    gsap.to(main, {
+    gsap.to(main, {                                                        // Animación del movimiento del contenedor
       y: targetY,
       duration: ANIM_DURATION,
       ease: "power2.out",
+
       onComplete: () => {
         isAnimating = false;
         current = next;
-        handleVideoVisibility();
+        handleVideoVisibility();                                           // Activa o pausa los videos dependiendo de la sección
 
-        if (window.collapse3DContainer) window.collapse3DContainer();
-        if (current === 1 && window.reset3DCamera) window.reset3DCamera();
+        if (window.collapse3DContainer) window.collapse3DContainer();      // Si la sección 3D estaba expandida, la colapsamos
+        if (current === 1 && window.reset3DCamera) window.reset3DCamera(); // Si entramos en sec2, reseteamos cámara del 3D
 
+        // Evento global para todas las secciones
         window.dispatchEvent(new CustomEvent("sectionChange", {
           detail: { current }
         }));
@@ -106,8 +98,8 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
 
     if (svcVids.length > 0) {
       svcVids.forEach(v => {
-        v.muted = true;
-        v.setAttribute("muted", "");
+        v.muted = true;                    // siempre muteado
+        v.setAttribute("muted", "");       // compatibilidad 100% móvil
 
         if (current === 2) v.play().catch(() => {});
         else v.pause();
@@ -116,21 +108,25 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   }
 
   // --------------------------------------------------------------------------
-  // EVENTOS DE NAVEGACIÓN (ahora respetan __viewportLock)
+  // EVENTOS DE NAVEGACIÓN
   // --------------------------------------------------------------------------
+
+  // Ruedita del mouse
   function onWheel(e) {
     e.preventDefault();
-    if (isAnimating || isSnapDisabled() || window.__viewportLock) return;
-    if (e.deltaY > 10) goTo(current + 1);
-    else if (e.deltaY < -10) goTo(current - 1);
+    if (isAnimating || isSnapDisabled()) return;                   // Si estamos animando o snap desactivado → no navegar
+    if (e.deltaY > 10) goTo(current + 1);                          // Scroll hacia abajo
+    else if (e.deltaY < -10) goTo(current - 1);                    // Hacia arriba
   }
 
+  // Guardamos la posición donde empezó el toque
   function onTouchStart(e) {
     touchStartY = (e.touches?.[0]?.clientY) || e.clientY;
   }
 
+  // Detectamos si se deslizó suficiente para cambiar de sección
   function onTouchEnd(e) {
-    if (isAnimating || isSnapDisabled() || window.__viewportLock) return;
+    if (isAnimating || isSnapDisabled()) return;
     const endY = (e.changedTouches?.[0]?.clientY) || e.clientY;
     const diff = touchStartY - endY;
 
@@ -138,22 +134,21 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
     else if (diff < -TOUCH_THRESHOLD) goTo(current - 1);
   }
 
+  // Navegación mediante teclado
   function onKeyDown(e) {
-    if (isAnimating || isSnapDisabled() || window.__viewportLock) return;
-    if (["ArrowDown", "PageDown", " "].includes(e.key)) {
+    if (isAnimating || isSnapDisabled()) return;
+    if (["ArrowDown", "PageDown", " "].includes(e.key)) {         // Bajada
       e.preventDefault(); goTo(current + 1);
-    } else if (["ArrowUp", "PageUp"].includes(e.key)) {
+    } else if (["ArrowUp", "PageUp"].includes(e.key)) {           // Subida
       e.preventDefault(); goTo(current - 1);
-    } else if (e.key === "Home") {
+    } else if (e.key === "Home") {                                // Ir al inicio
       e.preventDefault(); goTo(0);
-    } else if (e.key === "End") {
+    } else if (e.key === "End") {                                 // Ir al final
       e.preventDefault(); goTo(total - 1);
     }
   }
 
-  // --------------------------------------------------------------------------
-  // NAV helpers
-  // --------------------------------------------------------------------------
+  // Nav
   function wireNavLinks() {
     document.querySelectorAll(".navbar a[data-index]").forEach(a => {
       a.addEventListener("click", (ev) => {
@@ -163,99 +158,36 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
     });
   }
 
+  // Botón "siguiente sección" de la sección 4
   function wireNextButton() {
     const btn = document.querySelector('#sec4 .btn-next');
     if (!btn) return;
 
     btn.addEventListener('click', (ev) => {
       ev.preventDefault();
-      goTo(current + 1);
+      goTo(current + 1); // va a la siguiente sección con animación
     });
   }
-
-  // --------------------------------------------------------------------------
-  // ON RESIZE (recalcula y reposiciona)
-  // --------------------------------------------------------------------------
+  
   function onResize() {
-    updateVH();
-    const stableHeight = getStableHeight();
-    // Usar set en vez de animación para mantener precisión
-    gsap.set(main, { y: -current * stableHeight, force3D: true });
+    updateVH();                                                   // recalcula ahora mismo
+    const stableHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh')) * 100; // Reconstruye el equivalente a 100vh REAL multiplicando la unidad 1vh corregida (--vh) por 100
+    gsap.set(main, { y: -current * stableHeight });
   }
-
-  // --------------------------------------------------------------------------
-  // VISUAL VIEWPORT WATCHER (detecta pinch/zoom y cambia comportamiento)
-  // --------------------------------------------------------------------------
-  (function visualViewportWatcher() {
-    const vp = window.visualViewport;
-    let lastScale = vp ? vp.scale : 1;
-    let lastHeight = window.innerHeight;
-    let settleTimer = null;
-
-    function beginLock() {
-      // Bloquea navegación y punteros mientras zoom/scroll de viewport está activo
-      window.__viewportLock = true;
-      document.documentElement.classList.add("viewport-lock");
-      // Detener tweens activos que puedan animar 'main' mientras el viewport está moviéndose
-      try { gsap.killTweensOf(main); } catch (e) {}
-    }
-
-    function endLockAndStabilize() {
-      clearTimeout(settleTimer);
-      // Pequeña espera para estabilizar (adaptable)
-      settleTimer = setTimeout(() => {
-        // Recalcular --vh usando innerHeight real (ya estabilizado)
-        updateVH();
-        // Reposicionar main exactamente al panel actual
-        const stableHeight = getStableHeight();
-        gsap.set(main, { y: -current * stableHeight, force3D: true });
-        // Desbloquear
-        window.__viewportLock = false;
-        document.documentElement.classList.remove("viewport-lock");
-      }, 250);
-    }
-
-    function handler() {
-      const curScale = vp ? vp.scale : 1;
-      const curHeight = window.innerHeight;
-
-      // Si detectamos cambio de escala o de altura significativo → bloqueo
-      if (Math.abs(curScale - lastScale) > 0.002 || Math.abs(curHeight - lastHeight) > 8) {
-        lastScale = curScale;
-        lastHeight = curHeight;
-        beginLock();
-        endLockAndStabilize();
-      } else {
-        // Si no hay cambio grande, aún puede ser un pequeño reajuste → ejecutamos estabilización suave
-        endLockAndStabilize();
-      }
-    }
-
-    if (vp) {
-      vp.addEventListener("resize", handler);
-      vp.addEventListener("scroll", handler); // algunos navegadores mueven visualViewport al pinchar
-    } else {
-      // Fallback: si no hay visualViewport, usar resize global
-      window.addEventListener("resize", () => {
-        // bloqueo temporal corto para evitar movimientos mientras el SO ajusta barras
-        beginLock();
-        endLockAndStabilize();
-      });
-    }
-  })();
 
   // --------------------------------------------------------------------------
   // INICIALIZACIÓN
   // --------------------------------------------------------------------------
+
   function init() {
 
     updateVH();                                                   // asegurar valor actualizado al crear layout
 
     // Inicializa posiciones y barra
-    gsap.set(main, { y: 0, force3D: true });
+    gsap.set(main, { y: 0 });
     gsap.set(progressBar, { width: "0%" });
 
-    // Conectamos todos los eventos de navegación (respetan window.__viewportLock)
+    // Conectamos todos los eventos de navegación
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchend", onTouchEnd, { passive: true });
@@ -265,22 +197,23 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
       onResize();
     });
 
-    window.addEventListener("orientationchange", () => {
+    window.addEventListener("orientationchange", () => {          // Para cuando se gira el celular
       setTimeout(() => {
         updateVH();
         onResize();
-      }, 400);
+      }, 400);                                                    // Espera 400ms y luego actualiza altura y ejecuta onResize()
     });
 
     wireNavLinks();
     wireNextButton();
-
+    
     initSec1();
     initSec2();
     initSec3();
     initSec4();
     initSec5();
     initSec6();
+
 
     // Reproducir el video inicial (por si quedó pausado)
     if (video1) video1.play().catch(() => {});
@@ -303,5 +236,6 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   window.getCurrentSection = () => current;
 
 })();
+
 
 
