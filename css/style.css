@@ -247,11 +247,18 @@ body.preloader .scroll-progress {
 
 }
 
+/* mientras el viewport está inestable: bloquea interacciones para evitar navegación/gestos no deseados */
+.viewport-lock * {
+  pointer-events: none !important;
+  touch-action: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
 
-
-
-
-
-
-
-
+/* Asegura animación suave y evita subpixel blurs */
+#main {
+  transform: translate3d(0,0,0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -webkit-transform-style: preserve-3d;
+}
