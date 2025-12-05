@@ -29,9 +29,12 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   // VH (soporte visualViewport si existe)
   // --------------------------------------------------------------------------
   function updateVH() {                                                         // Actualiza variable CSS --vh dependiendo del viewport real
-    const viewport = window.visualViewport;                                     // Detecta viewport real si existe
-    const height = viewport ? viewport.height : window.innerHeight;             // Si existe visualViewport, usa su altura real. Si no existe (computadoras o navegadores antiguos), usa window.innerHeight
-    document.documentElement.style.setProperty('--vh', `${height * 0.01}px`);   // escribe el 1% de la altura real en la variable CSS --vh
+    // Altura real visible incluso con zoom, cambios de teclado, barras dinámicas, etc.
+  let realVH = viewport
+    ? viewport.height * viewport.scale
+    : window.innerHeight;
+
+  document.documentElement.style.setProperty('--vh', realVH * 0.01 + "px");
   }
   updateVH();                                                                   // Ejecuta al inicio
 
@@ -447,5 +450,6 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   window.getCurrentSection = () => current;                                     // expone función para obtener sección actual
 
 })();
+
 
 
