@@ -277,7 +277,6 @@ export function initSec2() {
 
     hint.style.display = "none";                                               // Ocultar el mensaje de ayuda
     closeBtn.style.display = "block";                                          // mostrar la X
-    document.body.classList.add("disable-snap");                               // desactivar snap scroll
   }
 
   // ======= COLAPSAR =========================
@@ -343,7 +342,6 @@ export function initSec2() {
 
 
     closeBtn.style.display = "none";                                          // ocultar X
-    document.body.classList.remove("disable-snap");                           // reactivar snap scroll
   }
 
   // ======= EVENTOS ==========================
@@ -385,12 +383,37 @@ export function initSec2() {
     }
   });
 
+  // ----------------------------------------
+  // Evitar scroll de la página mientras se interactúa con el canvas expandido
+  // ----------------------------------------
+  function preventDocScrollIfExpanded(e) {                                    // intenta prevenir scroll y propagación cuando hay interacción dentro del contenedor
+    if (!expanded) return;                                                    // si no está expandido, permitir comportamiento normal
+    if (e.cancelable) e.preventDefault();                                     // previene scroll/zoom nativo si el evento puede cancelarse
+    e.stopPropagation();                                                      // evita que el evento suba al document/body
+  }
+
+  // Rueda del mouse sobre el contenedor -> evitar que mueva la página (pero permitir zoom de cámara con wheel)
+  container.addEventListener('wheel', (e) => {
+    preventDocScrollIfExpanded(e);
+  }, { passive: false });
+
+  // Touch dentro del contenedor -> bloquear scroll nativo mientras está expandido
+  container.addEventListener('touchstart', (e) => {
+    if (!expanded) return;
+    if (e.cancelable) e.preventDefault();
+  }, { passive: false });
+
+  container.addEventListener('touchmove', (e) => {
+    preventDocScrollIfExpanded(e);
+  }, { passive: false });
+
+  // pointerdown para evitar que drags sobre la barra/scroll causen efectos
+  container.addEventListener('pointerdown', (e) => {
+    if (!expanded) return;
+    e.stopPropagation();
+  }, { passive: true });
+
   window.expand3DContainer = expandContainer;
   window.collapse3DContainer = collapseContainer;
-
-  document.addEventListener("sectionChange", () => {
-    document.body.classList.remove("disable-snap");
-  });
-
-
 }
+
