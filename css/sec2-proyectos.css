@@ -21,6 +21,8 @@
 }
 
 #model-container.expanded {
+  touch-action: none;                                       /* le dice al navegador que no haga gestos de pan/scroll/zoom nativos aquí */
+  pointer-events: auto;                                     /* aseguramos que el contenedor siga recibiendo eventos */
   z-index: 20;
 }
 
@@ -156,4 +158,5 @@
   #model-hint {
     font-size: clamp(0.9rem, 2.9vw, 2.4rem);
   }
+
 }
