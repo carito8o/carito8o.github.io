@@ -1,14 +1,15 @@
 * { 
-  box-sizing: border-box; 
+  box-sizing: border-box;                                  /* Hace que width/height incluyan padding y borde; evita cálculos extra */
   margin: 0; 
   padding: 0; 
 }
 
-html, body { height: 100%; }
+html, body { height: 100%; }                               /* Hace que <html> y <body> ocupen el 100% de la altura de la ventana, lo cual permite que las secciones fullscreen calculen bien su altura. */
 
 body {
   font-family: "Nunito", sans-serif;
-  overflow: hidden;                                         /* Deshabilita scroll nativo → controlado por GSAP */
+  overflow-y: auto;                                        /* Permite desplazamiento vertical normal. */
+  -webkit-overflow-scrolling: touch;                       /* Activa el “scroll suave” nativo en dispositivos iOS. */
   background: #000;
   color: #fff;
 }
@@ -21,23 +22,33 @@ body.preloader .scroll-progress {
   opacity: 0;
 }
 
+/* Evita que la pantalla se mueva cuando JS la bloquea en dispositivos táctiles */
+body.no-scroll {
+  overflow: hidden !important;                             /* Quita la posibilidad de hacer scroll manual mientras se anima una transición */
+}
+
 /* ======================== CONTENEDOR PRINCIPAL ======================== */
 #main {
   width: 100%;
-  height: calc(var(--vh) * 100);                            /* Igual que .panel: usamos la misma unidad corregida */
-  will-change: transform;                                   /* optimiza animaciones GSAP */
+  scroll-snap-type: y mandatory;                           /* Activa el “snap scroll”: obliga a detener el scroll en puntos definidos en el eje vertical (y). mandatory = siempre se alinea. */
+  -webkit-overflow-scrolling: touch;                       /* En iOS mejora la fluidez del scroll. */
+  will-change: auto;                                       /* Aviso al navegador para optimizar cambios por posibles animaciones (aunque auto aquí indica que no se fuerza optimización innecesaria). */
 }
 
 /* ======================== SECCIONES ======================== */
 .panel {
   width: 100%;
-  height: calc(var(--vh) * 100);                            /* 100 × (1vh corregido) reconstruye un 100vh real incluso en móviles que recortan la altura del viewport. */
+  height: 100dvh;                                          /* Altura usando unidad dinámica real del viewport (incluye zoom y barras del navegador) */
+  min-height: calc(var(--vh, 1vh) * 100);                  /* Fallback para navegadores que no soportan 100dvh. Usa la variable --vh calculada por JS (altura real del viewport). Si la variable no existe, usa 1vh normal. */
+
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   text-align: center;
   overflow: hidden;
+
+  scroll-snap-align: start;                                /* Marca el “punto de encaje” para el scroll-snap:  indica que la parte superior (“start”) debe alinearse con el viewport. */
 }
 
 /* Fondo de cada seccion */
@@ -47,10 +58,11 @@ body.preloader .scroll-progress {
 .panel-5 { background: linear-gradient(135deg, #8f9e6b, #4f8339); color: #fff; }
 .panel-6 { background: linear-gradient(135deg, #0a0a0a 0%, #0f1f0f 100%); color: #fff; }
 
+
 /* ======================== SECCION INICIO (SEC1) ======================== */
 
 .background-clip { /* VIDEO DE FONDO */
-  position: fixed;                                          /* se queda pegado al viewport */
+  position: absolute;
   top: 0; 
   left: 0;
   width: 100%; 
@@ -128,7 +140,7 @@ body.preloader .scroll-progress {
 }
 
 /* ======================== NAVBAR ======================== */
-.navbar {                                                   /* siempre visible */
+.navbar {
   position: fixed;
   top: 20px;
   left: 50%;
@@ -244,5 +256,4 @@ body.preloader .scroll-progress {
   .scroll-progress { max-width: 90%; bottom: 14px; }
   .navbar ul { font-size: 60%; gap: 1px; }
   .page-border {border: 7px solid}
-
 }
