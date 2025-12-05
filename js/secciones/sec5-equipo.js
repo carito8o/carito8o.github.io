@@ -55,7 +55,7 @@ export function initSec5() {
         "touchend",
         (e) => {
           ultimoToque = Date.now();                                                    // Registra el momento del toque
-          if (!e.target.closest(".info__link")) e.preventDefault();                    // Evita que el navegador simule un click después del toque
+          if (!e.target.closest(".info__link") && e.cancelable) { e.preventDefault(); }// Evita que el navegador simule un click después del toque
           activate(e, tarjeta);                                                        // Activar abrir/cerrar
         },
         { passive: false }
@@ -274,4 +274,5 @@ export function initSec5() {
     });
   }
 }
+
 
