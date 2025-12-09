@@ -7,21 +7,18 @@ export function initSec6() {
 
   const tl = gsap.timeline({ paused: true });                                               // Creamos una línea de tiempo, pero pausada (no se ejecuta cuando se crea, se ejecuta al llegar a la seccion 6)
 
-  // Animación de títulos y descripciones (la inicial)
-  tl.fromTo(
+  tl.fromTo(                                                                                // Animación de títulos y descripciones (la inicial)
     section.querySelectorAll(".contact-title, .contact-desc"),
     { opacity: 0, y: 30 },                                                                  // Estado inicial: abajo + invisible
     { opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: "power2.out" }                  // Estado final: visible + arriba
   )
-  // Animación de las tarjetas de contacto
-    .fromTo(
+    .fromTo(                                                                                // Animación de las tarjetas de contacto
       section.querySelectorAll(".contact-card"),
       { opacity: 0, y: 40, scale: 0.98 },                                                   // Ligeramente pequeñas y escondidas
       { opacity: 1, y: 0, scale: 1, duration: 0.7, stagger: 0.12, ease: "power3.out" },
       0.15                                                                                  // Inicia 0.15s después de la animación anterior
     )
-    // Animación del footer
-    .fromTo(
+    .fromTo(                                                                                // Animación del footer
       section.querySelector(".contact-footer"),
       { opacity: 0, y: 20 },
       { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
@@ -36,17 +33,18 @@ export function initSec6() {
       });
     });
 
-    // Observer: activa la animación cuando 60% de la sección está visible
-  const observer = new IntersectionObserver(([entry], obs) => {
-    if (entry.isIntersecting) {
-      tl.play(0);                                                                           // Ejecuta la animación desde el inicio, cuando entramos a la seccion
-      obs.unobserve(section);                                                               // Ya no observar más (no repetir la animación)
-    }
-  }, { threshold: 0.6 });
+    const observer = new IntersectionObserver(([entry], obs) => {                           // Observer: activa la animación cuando 60% de la sección está visible
+      if (entry.isIntersecting) {
+        tl.play(0);                                                                         // Ejecuta la animación desde el inicio, cuando entramos a la seccion
+        obs.unobserve(section);                                                             // Ya no observar más (no repetir la animación)
+      }
+    }, { threshold: 0.6 });
 
   observer.observe(section);
 
-  // Copiar teléfono y mostrar notificación -------------------------
+  // ----------------------------------------------------------------
+  // Copiar teléfono y mostrar notificación
+  // ----------------------------------------------------------------
 
   const phoneEl = document.getElementById("phone-number");
 
@@ -54,28 +52,28 @@ export function initSec6() {
     phoneEl.addEventListener("click", () => {
       navigator.clipboard.writeText("+57 304 302 1622").then(() => {                        // Copiar y luego...
 
-        // Buscamos si ya existe una notificación previa
         let notiTel = document.querySelector(".copy-notiTel");
-        if (!notiTel) {
+        if (!notiTel) {                                                                     // Buscamos si ya existe una notificación previa
           notiTel = document.createElement("div");
           notiTel.className = "copy-notiTel";                                               // Le asignamos la clase CSS que define su estilo
           notiTel.textContent = "Número copiado";
           document.body.appendChild(notiTel);                                               // Lo agregamos al final del <body> para que se superponga visualmente
         }
 
-        // Mostrar animación
-        notiTel.classList.add("show");
+        notiTel.classList.add("show");                                                      // Mostrar animación
 
-        // Ocultar después de 2s
-        setTimeout(() => {
+        setTimeout(() => {                                                                  // Ocultar después de 2s
           notiTel.classList.remove("show");
         }, 2000);
       });
     });
   }
+
 }
 
-//   MODAL DE CONTACTO (EMAIL) ===============================================================================
+// ----------------------------------------------------------------
+//   MODAL DE CONTACTO (EMAIL)
+// ----------------------------------------------------------------
 
 const modal = document.getElementById("mail-modal");                                        // Fondo oscuro
 const modalContent = document.querySelector(".mail-modal-content");                         // Cuadro del modal 
@@ -89,22 +87,53 @@ const subject = encodeURIComponent("Consulta desde Gigazer");                   
 // --- Abrir modal ---
 btnCorreo?.addEventListener("click", e => {
   e.preventDefault();
+
   modal.style.display = "flex";                                                             // Mostramos el modal
+
+  window.dispatchEvent(new CustomEvent("modal-abierto", {                                   // Avisar a conTab.js que un modal se abrió
+    detail: {
+      modal: modal,
+      focusRoot: modalContent
+    }
+  }));
 });
 
 // --- Cerrar con la X ---
 btnClose?.addEventListener("click", () => {
-  modal.style.display = "none";
+  cerrarModal();
 });
 
 // --- Cerrar tocando afuera ---
 modal.addEventListener("click", e => {                                                      // Cerrar si se toca el fondo oscuro
   if (!modalContent.contains(e.target)) {                                                   // Detecta si se hizo clic fuera del cuadro (modal)
-    modal.style.display = "none";
+    cerrarModal();
   }
 });
 
-// --- Acciones de los botones (Gmail, Outlook, Yahoo, etc.) ---
+// CERRAR MODAL CON ENTER EN LA X
+btnClose?.addEventListener("keydown", e => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    cerrarModal();
+  }
+});
+
+// Cerrar modal si la sección cambia (scrollbar, wheel, teclado, lo que sea)
+window.addEventListener("sectionChange", () => {
+  if (modal.style.display === "flex") {
+    cerrarModal();
+  }
+});
+
+// FUNCIÓN GENERAL DE CERRAR
+function cerrarModal() {
+  modal.style.display = "none";
+
+  window.dispatchEvent(new CustomEvent("modal-cerrado"));                                   // Avisar a conTab.js que ya puede restaurar el focus normal
+}
+ 
+
+// --- Acciones de los botones (Gmail, Outlook, Yahoo, etc.) -----------------
 document.querySelectorAll(".mail-options button").forEach(btn => {
   btn.addEventListener("click", () => {
 
@@ -141,6 +170,5 @@ document.querySelectorAll(".mail-options button").forEach(btn => {
     modal.style.display = "none";                                                           // Oculta el modal después de elegir una opción
   });
 });
-
 
 
