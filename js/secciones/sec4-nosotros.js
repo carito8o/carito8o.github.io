@@ -8,7 +8,9 @@ export function initSec4() {
 
   if (!circulo || !contenido || !sec4) return;                              // Si alguno de los elementos no existe, se detiene la función para evitar errores
 
-  // Ajustar el texto para que encaje dentro del círculo ---------------------------------------------------------
+  // ----------------------------------------------------------------
+  // Ajustar el texto para que encaje dentro del círculo
+  // ----------------------------------------------------------------
 
   function ajustarContenidoAlCirculo() {
 
@@ -43,8 +45,9 @@ export function initSec4() {
     requestAnimationFrame(ajustarContenidoAlCirculo);
   });
 
-
-  // Ocultar botón next en pantallas táctiles ---------------------------------------------------------
+  // ----------------------------------------------------------------
+  // Ocultar botón next en pantallas táctiles
+  // ----------------------------------------------------------------
 
   const isTouch = window.matchMedia("(pointer: coarse)").matches;
   if (isTouch) {
@@ -52,8 +55,9 @@ export function initSec4() {
     if (btnNext) btnNext.style.display = 'none';                            // Ocultamos el botón en móviles
   }
 
-
-  // Observer principal de la sección - ANIMACIÓN DEL CÍRCULO Y APARICIÓN DE CONTENIDO ---------------------------------------------------------
+  // ----------------------------------------------------------------
+  // Observer principal de la sección - ANIMACIÓN DEL CÍRCULO Y APARICIÓN DE CONTENIDO
+  // ----------------------------------------------------------------
 
   let contenidoMostrado = false;                                            // Variable para evitar repetir animaciones
 
@@ -113,16 +117,16 @@ export function initSec4() {
 
   sec4Observer.observe(sec4);
 
-
-  // Animación de texto por parrafos ---------------------------------------------------------
+  // ----------------------------------------------------------------
+  // Animación de texto por parrafos
+  // ----------------------------------------------------------------
   
   const sec4Textos = document.querySelectorAll("#sec4 .nosotros__contenido p, #sec4 .nosotros__contenido h1");
 
   if (sec4Textos.length > 0) {
 
-    // Envolvemos cada párrafo en un <span>
     sec4Textos.forEach(el => {
-      const span = document.createElement("span");
+      const span = document.createElement("span");                          // Envolvemos cada párrafo en un <span>
       span.classList.add("linea");                                          // Clase que identificará cada parrafo animable
       span.innerHTML = el.innerHTML;                                        // Copiamos el contenido original
       el.innerHTML = "";                                                    // Limpiamos el elemento
@@ -147,3 +151,4 @@ export function initSec4() {
     textObserver.observe(contenido);
   }
 }
+
