@@ -10,8 +10,9 @@ export function initSec5() {
     contenedorTarjetas.innerHTML = cardsHTML;
   }
 
-  // SISTEMA TÁCTIL (TOUCH) — abrir / cerrar tarjetas en móviles -------------------------------------------------------------------------
-
+  // ----------------------------------------------------------------
+  // SISTEMA TÁCTIL (TOUCH) — abrir / cerrar tarjetas en móviles
+  // ----------------------------------------------------------------
   const isTouch = window.matchMedia("(pointer: coarse)").matches;
 
   if (isTouch) {
@@ -22,10 +23,15 @@ export function initSec5() {
     let ultimoToque = 0;                             // Guarda el tiempo del último toque (para distinguir click de touch)
     const TOUCH_DELAY = 700;                         // Retraso para diferenciar entre un "touch" real y el "click fantasma" que generan los móviles
 
+    // PARA EVITAR APERTURAS CON SCROLL (debe ser con tap)
+    let startX = 0, startY = 0;
+    let moved = false;
+    const MOVE_THRESHOLD = 12;                                                         // px mínimos para considerar movimiento real
+
     const cerrarTarjeta = tarjeta => {
       if (!tarjeta) return;
-      tarjeta.classList.remove("show-info");         // Oculta la información (descripcion y redes)
-      tarjetaAbierta = null;                         // Ninguna tarjeta queda abierta
+      tarjeta.classList.remove("show-info");                                           // Oculta la información (descripcion y redes)
+      tarjetaAbierta = null;                                                           // Ninguna tarjeta queda abierta
     };
 
     const abrirTarjeta = tarjeta => {
@@ -36,30 +42,48 @@ export function initSec5() {
       tarjetaAbierta = tarjeta;                                                        // Guardamos cuál está abierta ahora
     };
 
-    // Controla si abrir o cerrar al tocar
-    const activate = (evento, tarjeta) => {
+    const activate = (evento, tarjeta) => {                                            // Controla si abrir o cerrar al tocar
 
       if (evento.type === "click" && Date.now() - ultimoToque < TOUCH_DELAY) return;   // Si llega un click inmediatamente después de un touch, lo ignoramos
 
       if (evento.target.closest(".info__link")) return;                                // Si se tocó un enlace dentro de la tarjeta, no abrir/cerrar
+
+      if (moved) return; // Si se movió (scroll), NO abrir
 
       if (tarjetaAbierta === tarjeta) return cerrarTarjeta(tarjeta);                   // Si la tarjeta ya estaba abierta, se cierra
 
       abrirTarjeta(tarjeta);                                                           // Si no estaba abierta, se abre
     };
 
-    // Asignamos los eventos táctiles y de click a cada tarjeta
-    tarjetas.forEach(tarjeta => {
+    tarjetas.forEach(tarjeta => {                                                      // Asignamos los eventos táctiles y de click a cada tarjeta
       
-      tarjeta.addEventListener(
-        "touchend",
-        (e) => {
-          ultimoToque = Date.now();                                                    // Registra el momento del toque
-          if (!e.target.closest(".info__link") && e.cancelable) { e.preventDefault(); }// Evita que el navegador simule un click después del toque
-          activate(e, tarjeta);                                                        // Activar abrir/cerrar
-        },
-        { passive: false }
-      );
+      tarjeta.addEventListener("touchstart", e => {                                    // Registrar el inicio del toque
+        const t = e.touches[0];
+        startX = t.clientX;
+        startY = t.clientY;
+        moved = false;
+      }, { passive: true });
+
+      tarjeta.addEventListener("touchmove", e => {                                     // Detectar si hubo desplazamiento real (scroll)
+        const t = e.touches[0];
+        if (
+          Math.abs(t.clientX - startX) > MOVE_THRESHOLD ||
+          Math.abs(t.clientY - startY) > MOVE_THRESHOLD
+        ) {
+          moved = true;
+        }
+      }, { passive: true });
+
+      tarjeta.addEventListener("touchend", e => {                                      // Final del toque
+
+        ultimoToque = Date.now();                                                      // Registra el momento del toque
+
+        if (!e.target.closest(".info__link") && e.cancelable) {                        // Evita que el navegador simule un click después del toque
+          e.preventDefault();
+        }
+
+        activate(e, tarjeta);                                                          // Activar abrir/cerrar
+      }, { passive: false });
 
       // Aunque esto es código táctil, los móviles generan un "click" después del touch. Lo escuchamos para poder bloquear ese click fantasma dentro de activate().
       tarjeta.addEventListener("click", (e) => activate(e, tarjeta));
@@ -68,21 +92,21 @@ export function initSec5() {
     const sec5 = document.querySelector("#sec5");
 
     if (sec5) {
-      // tocar afuera de una tarjeta → cerrar
-      sec5.addEventListener("click", e => {
+      sec5.addEventListener("click", e => {                                            // tocar afuera de una tarjeta → cerrar
         if (!e.target.closest(".card__article")) {
           cerrarTarjeta(tarjetaAbierta);
         }
       });
 
-      // salir de la sección → cerrar
-      new IntersectionObserver(([entry]) => {
+      new IntersectionObserver(([entry]) => {                                          // salir de la sección → cerrar
         if (!entry.isIntersecting) cerrarTarjeta(tarjetaAbierta);
       }, { threshold: 0.1 }).observe(sec5);
     }
   }
 
-  // EFECTO 3D EN ESCRITORIO (INCLINACIÓN + REFLEJO) -------------------------------------------------------------------------
+  // ----------------------------------------------------------------
+  // EFECTO 3D EN ESCRITORIO (INCLINACIÓN + REFLEJO)
+  // ----------------------------------------------------------------
 
   const tieneHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;  // Comprueba si hay cursor preciso y soporta hover → indica que es PC con mouse
   
@@ -182,8 +206,7 @@ export function initSec5() {
   }
 
   function initExistingCards() {
-    // Activa el efecto 3D en todas las tarjetas ya existentes
-    document.querySelectorAll(selectorTarjetas).forEach(activarInclinacion3D);
+    document.querySelectorAll(selectorTarjetas).forEach(activarInclinacion3D);         // Activa el efecto 3D en todas las tarjetas ya existentes
   }
 
   initExistingCards();
@@ -205,23 +228,23 @@ export function initSec5() {
   }
   }
 
+  // ----------------------------------------------------------------
+  /* Fondo dependiendo el GPU
+  // ----------------------------------------------------------------
 
-  /* ================================================ Fondo dependiendo el GPU ================================================ */
-
-  /* ===========  MODO FULL O LITE? =========== */
+  /* -----------  MODO FULL O LITE? ----------- */
 
   const isGPU = tieneGPUReal();                                                        // Llama a la función global → true si hay GPU real, false si es CPU o WebGL lento
 
   if (!isGPU) {                                                                        // Si NO hay aceleración → activar modo LITE
     document.body.classList.add("sec5-lite");
 
-    // Desactiva por completo la burbuja interactiva del fondo en LITE
-    const bubble = document.querySelector("#sec5 .interactive");
+    const bubble = document.querySelector("#sec5 .interactive");                       // Desactiva por completo la burbuja interactiva del fondo en LITE
     if (bubble) bubble.remove();
     return;
   }
 
-  /* =========== ANIMACIÓN DE LA BURBUJA INTERACTIVA (solo modo FULL) =========== */
+  /* ----------- ANIMACIÓN DE LA BURBUJA INTERACTIVA (solo modo FULL) ----------- */
 
   document.body.classList.remove("sec5-lite");                                         // Hay GPU real → asegurar que esta en modo FULL
 
@@ -257,8 +280,7 @@ export function initSec5() {
       bubble.style.transform = "";                                                     // Resetea posición visual de la burbuja
     }
 
-    // Activación por cambio de sección
-    window.addEventListener("sectionChange", (e) => {
+    window.addEventListener("sectionChange", (e) => {                                  // Activación por cambio de sección
       const active = e.detail.current === 4;                                           // sec5 = index 4
       if (active) enable();                                                            // Entra → activa animación
       else disable();                                                                  // Sale → detiene animación
@@ -274,5 +296,4 @@ export function initSec5() {
     });
   }
 }
-
 
