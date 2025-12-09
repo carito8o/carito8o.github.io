@@ -12,11 +12,9 @@ export function initSec3() {
   let isScrolling = false;                                                              // indica si el usuario está desplazando la pantalla
   const SWIPE_THRESHOLD = 15;                                                           // distancia mínima en píxeles para considerar scroll
 
-  // Iteración por cada columna
-  columnasServicios.forEach(columna => {
+  columnasServicios.forEach(columna => {                                                // Iteración por cada columna
 
-    // Detectar inicio del toque
-    columna.addEventListener('touchstart', evento => {
+    columna.addEventListener('touchstart', evento => {                                  // Detectar inicio del toque
 
       inicioToqueY = evento.touches[0].clientY;                                         // Guardamos la posición inicial del dedo
       inicioToqueX = evento.touches[0].clientX;
@@ -25,8 +23,7 @@ export function initSec3() {
     }, { passive: true });                                                              // passive porque solo queremos leer el movimiento del dedo, no bloquear el scroll
 
 
-    // Detectar si el usuario se desplaza verticalmente
-    columna.addEventListener('touchmove', evento => {
+    columna.addEventListener('touchmove', evento => {                                   // Detectar si el usuario se desplaza verticalmente
       const desplazamientoY = Math.abs(evento.touches[0].clientY - inicioToqueY);       // Diferencia entre la posición inicial y la posición actual
       const desplazamientoX = Math.abs(evento.touches[0].clientX - inicioToqueX);
 
@@ -36,8 +33,7 @@ export function initSec3() {
     }, { passive: true });
 
 
-    // Detectar si fue un tap
-    columna.addEventListener('touchend', evento => {
+    columna.addEventListener('touchend', evento => {                                    // Detectar si fue un tap
       if (isScrolling) return;                                                          // Si el usuario estaba desplazándose, NO es un TAP
 
       evento.stopPropagation();                                                         // Evita que este toque "suba" a elementos padres y cierre todas las columnas
@@ -63,9 +59,9 @@ export function initSec3() {
     columnasServicios.forEach(c => c.classList.remove('servicio-activo'));
   });
 
-
-
-  /* Para que no se abra una columna sin antes mover el mouse al entrar en la seccion ============================================================ */
+  // ----------------------------------------------------------------
+  // Para que no se abra una columna sin antes mover el mouse al entrar en la seccion
+  // ----------------------------------------------------------------
 
   let hoverPermitido = true;                                                            // Control global: ¿se permite hover?
   let pointerMoveHandler = null;                                                        // Listener temporal del primer movimiento
@@ -80,8 +76,7 @@ export function initSec3() {
 
     if (pointerMoveHandler) return;                                                     // Evita añadir múltiples listeners si ya existe uno activo
 
-    // Cuando el usuario mueve realmente el mouse dentro de sec3
-    pointerMoveHandler = function () {
+    pointerMoveHandler = function () {                                                  // Cuando el usuario mueve realmente el mouse dentro de sec3
       hoverPermitido = true;
 
       // CSS vuelve a activar todo el comportamiento de hover
@@ -96,28 +91,23 @@ export function initSec3() {
     sec3.addEventListener("pointermove", pointerMoveHandler);
   }
 
-  // Reacciona a pointerenter de cada columna
-  columnasServicios.forEach(col => {
+  columnasServicios.forEach(col => {                                                    // Reacciona a pointerenter de cada columna
     col.addEventListener("pointerenter", () => {
       if (!hoverPermitido) col.classList.add("no-hover");                               // Si hover aún NO está permitido, forzar estado no-hover
       else col.classList.remove("no-hover");                                            // Si hover está habilitado, asegurar que la columna responda normal
     });
   });
 
-  // Cada vez que se entra o sale de sec3
-  window.addEventListener("sectionChange", (e) => {
+  window.addEventListener("sectionChange", (e) => {                                     // Cada vez que se entra o sale de sec3
     const cur = e?.detail?.current;
 
-    if (Number.isFinite(cur) && cur === 2) {
-      // Entramos a sec3 → esperar primer movimiento
+    if (Number.isFinite(cur) && cur === 2) {                                            // Entramos a sec3 → esperar primer movimiento
       instalarEsperaPrimerMovimiento();
-    } else {
-      // Saliendo de sec3 → resetear
+    } else {                                                                            // Saliendo de sec3 → resetear
       columnasServicios.forEach(c => c.classList.remove("no-hover"));
       document.body.classList.remove("hover-enabled");
 
-      // Si aún existe el listener pendiente del primer movimiento → eliminarlo
-      if (pointerMoveHandler) {
+      if (pointerMoveHandler) {                                                         // Si aún existe el listener pendiente del primer movimiento → eliminarlo
         sec3.removeEventListener("pointermove", pointerMoveHandler);
         pointerMoveHandler = null;
       }
