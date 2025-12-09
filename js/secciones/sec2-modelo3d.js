@@ -3,8 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import gsap from "gsap";
 
-// Exportamos una promesa que empieza a cargar el modelo 3D desde ya.
-export const modelPromise = new Promise((resolve) => {
+export const modelPromise = new Promise((resolve) => {                          // Exportamos una promesa que empieza a cargar el modelo 3D desde ya
     const loader = new GLTFLoader().setPath("../../modelos/Cartagena glft/");
     loader.load("scene.gltf", (gltf) => {
         resolve(gltf.scene);                                                    // Si se carga correctamente, resolvemos la promesa con la escena del modelo
@@ -70,8 +69,7 @@ export function initSec2() {
   const initialCameraPos = camera.position.clone();
   const initialTarget = controls.target.clone();
 
-  // Función para reiniciar cámara y controles
-  function resetCamera() {
+  function resetCamera() {                                                     // Función para reiniciar cámara y controles
     gsap.to(camera.position, {
       x: initialCameraPos.x,
       y: initialCameraPos.y,
@@ -135,29 +133,23 @@ export function initSec2() {
   let activeRender = false;
   let needsRender = true;
 
-  // Si el usuario mueve los controles → hay que volver a renderizar
-  controls.addEventListener("change", () => needsRender = true);
+  controls.addEventListener("change", () => needsRender = true);               // Si el usuario mueve los controles → hay que volver a renderizar
 
   function animate() {
     if (!isVisible) return;
     animationId = requestAnimationFrame(animate);
 
-      // Bloquea interacción si está colapsado
-      controls.enabled = expanded;
+    controls.enabled = expanded;                                               // Bloquea interacción si está colapsado
 
-    // Render continuo si el contenedor está expandido
-    if (expanded || activeRender) {
+    if (expanded || activeRender) {                                            // Render continuo si el contenedor está expandido
       controls.update();
       renderer.render(scene, camera);
-      // Si no está expandido pero tiene auto-rotación → render
-    } else if (controls.autoRotate && !expanded) {
+    } else if (controls.autoRotate && !expanded) {                             // Si no está expandido pero tiene auto-rotación → render
       renderer.render(scene, camera);
     }
-
-    // Si no hay auto-rotación, solo renderizamos mínimo cuando sea necesario
-    else if (needsRender) {
+    else if (needsRender) {                                                    // Si no hay auto-rotación, solo renderizamos mínimo cuando sea necesario
       renderer.render(scene, camera);
-      needsRender = false;           // ya se actualizó
+      needsRender = false;                                                     // ya se actualizó
     }
   }
 
@@ -166,27 +158,27 @@ export function initSec2() {
   hint.id = "model-hint";
   hint.innerText = "Toca para interactuar";
   container.appendChild(hint);
-  hint.style.opacity = "0"; // oculto al inicio
+  hint.style.opacity = "0";                                                    // oculto al inicio
 
 
-  // Observer → Detecta si la sección está en pantalla --------------------------------------------
+  // ----------------------------------------------------------------
+  // Observer → Detecta si la sección está en pantalla
+  // ----------------------------------------------------------------
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
 
       if (entry.isIntersecting) {
-        // La sección es visible
-        isVisible = true;
+        isVisible = true;                                                      // La sección es visible
         animate();
 
-        // Mostrar hint ("Toca para interactuar") solo la primera vez
-        if (hint.style.opacity === "0") {
+        if (hint.style.opacity === "0") {                                      // Mostrar hint ("Toca para interactuar") solo la primera vez
           hint.style.opacity = "1";
           setTimeout(() => {
             hint.style.opacity = "0";
           }, 3000);
         }
-      } else {
-        // La sección dejó de ser visible → parar animación
+      } else {                                                                 // La sección dejó de ser visible → parar animación
         isVisible = false;
       cancelAnimationFrame(animationId);
       }
@@ -195,7 +187,9 @@ export function initSec2() {
 
   observer.observe(container);
 
-  // ======== RESIZE ===========================
+  // ----------------------------------------------------------------
+  // RESIZE
+  // ----------------------------------------------------------------
   function resizeRenderer() {
     const newWidth = container.clientWidth;
     const newHeight = container.clientHeight;
@@ -203,8 +197,7 @@ export function initSec2() {
     camera.aspect = newWidth / newHeight;
     camera.updateProjectionMatrix();
 
-    // Solo cuando está colapsado guardamos el tamaño inicial
-    if (!expanded) {
+    if (!expanded) {                                                           // Solo cuando está colapsado guardamos el tamaño inicial
       initialWidth = newWidth;
       initialHeight = newHeight;
     }
@@ -214,7 +207,9 @@ export function initSec2() {
   window.addEventListener("resize", resizeRenderer);
   window.resize3DRenderer = resizeRenderer;
 
-  // ======= EXPANDIR ==========================
+  // ----------------------------------------------------------------
+  // EXPANDIR
+  // ----------------------------------------------------------------
   function expandContainer() {
     if (expanded || isTransitioning) return;                                   // prevenir doble toque
   
@@ -227,8 +222,18 @@ export function initSec2() {
     controls.update();
 
     animate();                                                                 // asegurar render continuo
-
     container.classList.add("expanded");                                       // activar CSS fullscreen
+
+    const IS_TOUCH = window.matchMedia("(pointer: coarse)").matches;           // cuando se expande en móviles, ajustar sec2
+    if (IS_TOUCH) {
+        const sec2 = document.getElementById("sec2");
+        if (sec2) {
+            sec2.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+    }
 
     gsap.killTweensOf(container);                                              // cancela cualquier animación previa
     gsap.to(container, {
@@ -279,7 +284,9 @@ export function initSec2() {
     closeBtn.style.display = "block";                                          // mostrar la X
   }
 
-  // ======= COLAPSAR =========================
+  // ----------------------------------------------------------------
+  // COLAPSAR
+  // ----------------------------------------------------------------
   function pauseScene() {
     cancelAnimationFrame(animationId);
     controls.autoRotate = false;
@@ -297,8 +304,7 @@ export function initSec2() {
 
     container.classList.remove("expanded");
 
-    // Animación inversa del contenedor
-    gsap.killTweensOf(container);
+    gsap.killTweensOf(container);                                              // Animación inversa del contenedor
     gsap.to(container, {
       width: initialWidth,
       height: initialHeight,
@@ -310,13 +316,12 @@ export function initSec2() {
         renderer.render(scene, camera);
       },
       onComplete: () => {
-        isTransitioning = false;                                              // libera
+        isTransitioning = false;                                               // libera
         pauseScene();
       }
     });
 
-    // Mostrar título nuevamente
-    if (title) {
+    if (title) {                                                               // Mostrar título nuevamente
       gsap.killTweensOf(title);
       title.setAttribute('aria-hidden', 'false');
       title.style.pointerEvents = 'auto';
@@ -341,10 +346,12 @@ export function initSec2() {
     }
 
 
-    closeBtn.style.display = "none";                                          // ocultar X
+    closeBtn.style.display = "none";                                           // ocultar X
   }
 
-  // ======= EVENTOS ==========================
+  // ----------------------------------------------------------------
+  // EVENTOS
+  // ----------------------------------------------------------------
 
   // --- TAP vs SCROLL en pantallas táctiles ---
   let touchStartY = 0;
@@ -357,24 +364,43 @@ export function initSec2() {
   container.addEventListener("touchend", (e) => {
     touchEndY = e.changedTouches[0].clientY;
 
+    // ---- Si tocó la X, cerramos y salimos ----
+    if (e.target === closeBtn || e.target.closest && e.target.closest("#close-btn")) {
+      ; // dejar que closeBtn procese su click
+    }
+
     // Diferencia pequeña → fue un TAP, no un scroll
-    if (Math.abs(touchStartY - touchEndY) < 10 && e.target !== closeBtn) {
+    if (Math.abs(touchStartY - touchEndY) < 10) {
       expandContainer();
     }
-  });
+  }, { passive: true });
 
   // Clic en el contenedor → expandir (si no se tocó la X)
   container.addEventListener("click", (e) => {
-    if (e.target !== closeBtn) {
-      expandContainer();
+    // Si el click vino de la X (o de un hijo), no expandir
+    if (e.target === closeBtn || (e.target.closest && e.target.closest("#close-btn"))) {
+      return;
     }
-  });
+    expandContainer();
+  }, { passive: true });
+
+  closeBtn.addEventListener("pointerup", (e) => {
+    e.stopPropagation();
+    collapseContainer();
+  }, { passive: true });
+
+  closeBtn.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    collapseContainer();
+  }, { passive: false });                            
 
   // clic en X → colapsar
-  closeBtn.addEventListener("click", (e) => {
-    e.stopPropagation();                                                      // evita que el clic también active expansión
+  closeBtn.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     collapseContainer();
-  });
+  }, { passive: false });
 
   // Clic fuera del contenedor → colapsar
   document.addEventListener("click", (e) => {
@@ -383,13 +409,13 @@ export function initSec2() {
     }
   });
 
-  // ----------------------------------------
+  // ----------------------------------------------------------------
   // Evitar scroll de la página mientras se interactúa con el canvas expandido
-  // ----------------------------------------
-  function preventDocScrollIfExpanded(e) {                                    // intenta prevenir scroll y propagación cuando hay interacción dentro del contenedor
-    if (!expanded) return;                                                    // si no está expandido, permitir comportamiento normal
-    if (e.cancelable) e.preventDefault();                                     // previene scroll/zoom nativo si el evento puede cancelarse
-    e.stopPropagation();                                                      // evita que el evento suba al document/body
+  // ----------------------------------------------------------------
+  function preventDocScrollIfExpanded(e) {                                     // intenta prevenir scroll y propagación cuando hay interacción dentro del contenedor
+    if (!expanded) return;                                                     // si no está expandido, permitir comportamiento normal
+    if (e.cancelable) e.preventDefault();                                      // previene scroll/zoom nativo si el evento puede cancelarse
+    e.stopPropagation();                                                       // evita que el evento suba al document/body
   }
 
   // Rueda del mouse sobre el contenedor -> evitar que mueva la página (pero permitir zoom de cámara con wheel)
@@ -412,6 +438,7 @@ export function initSec2() {
     if (!expanded) return;
     e.stopPropagation();
   }, { passive: true });
+
 
   window.expand3DContainer = expandContainer;
   window.collapse3DContainer = collapseContainer;
