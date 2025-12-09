@@ -2,7 +2,9 @@ import { gsap } from "gsap";
 
 const isMobile = window.matchMedia("(pointer: coarse)").matches;
 
-// Animación de presentación (Explora más → GIGAZER)  ---------------------------------------------------------
+// ----------------------------------------------------------------
+// Animación de presentación (Explora más → GIGAZER)
+// ----------------------------------------------------------------
 
 function animarPresentacion() {
   const h1 = document.querySelector("#sec1 .content h1");
@@ -38,7 +40,9 @@ function animarPresentacion() {
     });
 }
 
-// Efecto “wave” en las letras del título  -----------------------------------------------------------------------
+// ----------------------------------------------------------------
+// Efecto “wave” en las letras del título
+// ----------------------------------------------------------------
 
 function aplicarWaveLetters(titulo) {
   if (!titulo || titulo.dataset.wave) return;
@@ -50,7 +54,6 @@ function aplicarWaveLetters(titulo) {
     `<span class="h1-char">${ch === " " ? "&nbsp;" : ch}</span>`      // si la "letra" es un espacio, escribir &nbsp (porque los espacios normales desaparecen en HTML), si NO es un espacio, escribir la letra normal.
   ).join("");                                                         // join("") junta todo eso en un solo string largo, sin comas
 
-  // Inyectar CSS una sola vez
   if (!document.getElementById("h1-wave-style")) {                    // Evita duplicar el CSS agregándolo solo si no está ya en el documento
     const style = document.createElement("style");
     style.id = "h1-wave-style";
@@ -93,7 +96,9 @@ function aplicarWaveLetters(titulo) {
   titulo.setAttribute("tabindex", "-1");
 }
 
-// Interacción — “GIGAZER mira al mouse”  ----------------------------------------------------------------------
+// ----------------------------------------------------------------
+// Interacción — “GIGAZER mira al mouse”
+// ----------------------------------------------------------------
 
 let onMove, onLeave;
 
@@ -131,23 +136,25 @@ function desactivarEfectoMirada() {
   }
 }
 
-// Inicialización general  -------------------------------------------------------------------------------------
+// ----------------------------------------------------------------
+// Inicialización general
+// ----------------------------------------------------------------
 
 export function initSec1() {
-  // Activar animación inicial después del preloader
-  if (sessionStorage.getItem("preloaderMostrado")) {
+  
+  if (sessionStorage.getItem("preloaderMostrado")) {                  // Activar animación inicial después del preloader
     animarPresentacion();
   } else {
     document.addEventListener("loader:end", animarPresentacion, { once: true });  // Esperar a que el preloader termine y entonces animar la presentación
   }
 
-  // Activar/desactivar efecto de seguimiento de mouse según sección activa
-  window.addEventListener("sectionChange", (e) => {
+  window.addEventListener("sectionChange", (e) => {                   // Activar/desactivar efecto de seguimiento de mouse según sección activa
     const index = e.detail.current;
-    if (index === 0 && !isMobile) {                                     // Si estamos en la sección 0 (la primera) y NO es móvil
+    if (index === 0 && !isMobile) {                                   // Si estamos en la sección 0 (la primera) y NO es móvil
       activarEfectoMirada();
     } else {
       desactivarEfectoMirada();
     }
   });
 }
+
