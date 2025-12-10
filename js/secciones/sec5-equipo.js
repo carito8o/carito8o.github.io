@@ -102,6 +102,18 @@ export function initSec5() {
         if (!entry.isIntersecting) cerrarTarjeta(tarjetaAbierta);
       }, { threshold: 0.1 }).observe(sec5);
     }
+
+    // si hay una tarjeta abierta y se detecta scroll, cerrarla
+    let scrollCloseTimeout = null;
+    window.addEventListener('scroll', () => {
+      if (tarjetaAbierta) {
+        clearTimeout(scrollCloseTimeout);
+        // esperar un poco para no cerrar por micro-movimientos
+        scrollCloseTimeout = setTimeout(() => {
+          if (tarjetaAbierta) cerrarTarjeta(tarjetaAbierta);
+        }, 120);
+      }
+    }, { passive: true });
   }
 
   // ----------------------------------------------------------------
@@ -301,5 +313,6 @@ export function initSec5() {
     });
   }
 }
+
 
 
