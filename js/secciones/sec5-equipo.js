@@ -229,8 +229,13 @@ export function initSec5() {
   }
 
   // ----------------------------------------------------------------
-  /* Fondo dependiendo el GPU
+  // Fondo dependiendo el GPU
   // ----------------------------------------------------------------
+
+  // Si es móvil, NO ejecutar ninguna lógica animada de fondo
+  if (window.matchMedia("(max-width: 700px)").matches) {
+    return;
+  }
 
   /* -----------  MODO FULL O LITE? ----------- */
 
@@ -296,4 +301,5 @@ export function initSec5() {
     });
   }
 }
+
 
