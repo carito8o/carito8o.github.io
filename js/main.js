@@ -225,80 +225,72 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
 
 
     // --------------------------------------------------------------------------------------
-    // AUTOSNAP SOLO EN PC
+    // AUTOSNAP: detecta automáticamente snap preciso cuando se suelta la barra de navegación
     // --------------------------------------------------------------------------------------
-    (function iniciarAutoSnap_PC() {
+    (function iniciarAutoSnap() {
 
-      // protección para que autosnap JAMÁS corra en móviles
-      if (IS_TOUCH) return;
+      let barScrollTimeout = null;                                              // temporizador para detectar fin de scroll manual
+      let clickBarraNavegacion = false;                                         // flag para click inicial en zona scrollbar
 
-      let barScrollTimeout = null;
-      let clickBarraNavegacion = false;
-
-      function obtenerAnchoBarra() {
-        return window.innerWidth - document.documentElement.clientWidth;
+      function obtenerAnchoBarra() {                                            // función para calcular ancho de scrollbar relativa al viewport (window)
+        return window.innerWidth - document.documentElement.clientWidth;        // window.innerWidth incluye la scrollbar; clientWidth no
       }
 
-      window.addEventListener('pointerdown', (ev) => {
+      window.addEventListener('pointerdown', (ev) => {                          // detecta si el usuario hizo pointerdown cercano a la scrollbar del viewport
         if (loaderActivo()) { clickBarraNavegacion = false; return; }
-        if (isAnimating) { clickBarraNavegacion = false; return; }
-
         try {
-          const anchoBarraNav = obtenerAnchoBarra();
-          clickBarraNavegacion =
-            ev.clientX >= (document.documentElement.clientWidth - anchoBarraNav - 8);
+
+          if (isAnimating) { clickBarraNavegacion = false; return; }            // Si estamos en animación, ignoramos
+
+          const anchoBarraNav = obtenerAnchoBarra();                            // ancho de la barra
+
+          clickBarraNavegacion = ev.clientX >= (document.documentElement.clientWidth - anchoBarraNav - 8); // click en la zona derecha donde usualmente está la scrollbar del viewport
         } catch (err) {
           clickBarraNavegacion = false;
         }
       }, { passive: true });
 
-
-      function soltarBarraNavegacion() {
+      function soltarBarraNavegacion() {                                        // Si se levantó el mouse después de arrastrar la barra, entonces hace snap
         if (clickBarraNavegacion && !isAnimating) {
           snapASeccionMasCercana();
         }
         clickBarraNavegacion = false;
       }
       window.addEventListener('pointerup', soltarBarraNavegacion, { passive: true });
-      window.addEventListener('mouseup', soltarBarraNavegacion, { passive: true });
+      window.addEventListener('mouseup', soltarBarraNavegacion, { passive: true }); // también por compatibilidad
 
-      window.addEventListener('scroll', () => {
+      window.addEventListener('scroll', () => {                                 // scroll fallback: cuando el usuario deja de scrollear tras N ms
         if (loaderActivo()) return;
         if (isAnimating) return;
-
         clearTimeout(barScrollTimeout);
-        barScrollTimeout = setTimeout(() => {
-          snapASeccionMasCercana();
-        }, 120);
+        barScrollTimeout = setTimeout(() => { snapASeccionMasCercana(); }, 120);
       }, { passive: true });
 
-
-      // SNAP DE PC — nunca móvil
-      function snapASeccionMasCercana() {
-        if (IS_TOUCH) return;   // ← protección extra
+      
+      function snapASeccionMasCercana() {                                       // calcula la sección más centrada en viewport y hace goTo
+        if (IS_TOUCH) return;
         if (isAnimating) return;
 
-        const centroPantallaY = window.innerHeight / 2;
+        const centroPantallaY = window.innerHeight / 2;                         // detecta el centro del viewport, así sabemos qué punto se debe alinear
         let mejorIndice = current;
         let mejorDistancia = Infinity;
 
-        sections.forEach((sec, idx) => {
-          const rect = sec.getBoundingClientRect();
-          const secCenterY = rect.top + rect.height / 2;
-          const distance = Math.abs(secCenterY - centroPantallaY);
-
-          if (distance < mejorDistancia) {
+        sections.forEach((sec, idx) => {                                        // recorremos todas las secciones
+          const rect = sec.getBoundingClientRect();                             // rect relativo al viewport (top, bottom, height, etc. pero medidos en coordenadas del viewport)
+          const secCenterY = rect.top + rect.height / 2;                        // centro de la sección relativo a viewport
+          const distance = Math.abs(secCenterY - centroPantallaY);              // calcula cuánta diferencia hay respecto al centro del viewport
+          if (distance < mejorDistancia) {                                      // mientras más cerca esté del centro, más debe ser la sección ganadora
             mejorDistancia = distance;
             mejorIndice = idx;
           }
         });
 
-        if (mejorIndice !== current) {
-          goTo(mejorIndice);
-        } else {
+        if (mejorIndice !== current) {                                          // si es una sección diferente → haz snap
+          goTo(mejorIndice);                                                    // anima al índice ganador
+        } else {                                                                // si ya estamos en la mejor, reajustamos finamente para evitar quedar "medio pixel"
           const target = getSectionByIndex(current);
           if (!target || isAnimating) return;
-
+          // siempre usamos window (porque GO TO siempre usa window)
           gsap.to(window, {
             scrollTo: { y: target, autoKill: false },
             duration: 0.2,
@@ -307,21 +299,21 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
         }
       }
 
-    })(); // aquí termina iniciarAutoSnap_PC
+    })(); // aqui acaba iniciarAutoSnap
 
+    
   } else {
+    // ==========================================================================
+    // MÓVIL — actualizar barra de progreso durante scroll nativo
+    // ==========================================================================
 
-    // ======================================================================
-    // MÓVIL — PROGRESO DURANTE SCROLL NATIVO (sin snap)
-    // ======================================================================
     window.addEventListener("scroll", () => {
-      if (loaderActivo()) return;
-      const scrollY = window.scrollY;
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      const pct = maxScroll > 0 ? (scrollY / maxScroll) * 100 : 0;
-      gsap.set(progressBar, { width: pct + "%" });
+      if (loaderActivo()) return;                                               // si el preloader sigue activo → NO actualizamos la barra
+      const scrollY = window.scrollY;                                           // posición actual del scroll desde arriba
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight; // cuánto máximo puede scrollear el documento
+      const pct = maxScroll > 0 ? (scrollY / maxScroll) * 100 : 0;              // convierte el scroll a porcentaje entre 0 y 100
+      gsap.set(progressBar, { width: pct + "%" });                              // actualizar barra instantáneamente
     }, { passive: true });
-
   }
 
   // --------------------------------------------------------------------------
@@ -464,6 +456,7 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   window.getCurrentSection = () => current;                                     // expone función para obtener sección actual
 
 })();
+
 
 
 
