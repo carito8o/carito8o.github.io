@@ -7,6 +7,7 @@
    background: #D8D8D8;
    color: #000;
 	 overflow: hidden;
+   pointer-events: all;   /* para que pueda "tapar" los eventos de abajo */
 	 z-index: 9999;
 }
 
@@ -112,6 +113,26 @@
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* ===========================================
+   BLOQUEO TOTAL DE INTERACCIÓN DURANTE PRELOAD
+   =========================================== */
+body.preloader {
+  overflow: hidden !important;      /* bloquea scroll */
+  height: 100vh !important;
+  touch-action: none !important;    /* bloquea gestos táctiles */
+  pointer-events: none !important;  /* bloquea clics y wheel */
+}
+
+body.preloader * {
+  pointer-events: none !important;  /* ningún elemento recibe eventos */
+}
+
+/* exceptuamos el preloader */
+body.preloader .loading-screen {
+  pointer-events: all !important;   /* el preloader sí recibe eventos */
+}
+
 
 /* ------------------------ Responsivo para counter y spinner ------------------------ */
 
