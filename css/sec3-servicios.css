@@ -138,6 +138,12 @@
 }
 
 /* --- Estado activo táctil --- */
+#sec3 .servicios__col.servicio-activo .servicios__texto {
+    clip-path: inset(0 0 0 0 round 0.6rem);
+    transform: translate(-50%, -50%) scale(1.02);
+    background: rgba(0, 0, 0, 0.65);
+}
+
 #sec3 .servicios__col.servicio-activo .servicios__texto p {
   opacity: 1;
   max-height: 200px;
@@ -249,23 +255,4 @@
   #sec3 .servicios__hint {
     font-size: clamp(0.8rem, 2.8vw, 2.3rem);
   }
-}
-
-
-/* ====================================== SOLO SI CAMBIO DE VIDEO A GIF... sino borrar ============================================ */
-
-/* Contenedor del video/gif */
-.service-video {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 1rem; /* separación con el texto */
-}
-
-/* Imagen/gif dentro */
-.service-video img {
-  width: 100%;
-  max-width: 400px;   /* límite máximo para que no se hagan gigantes */
-  height: auto;
-  border-radius: 8px; /* opcional: esquinas redondeadas */
 }
