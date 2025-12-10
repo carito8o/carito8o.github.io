@@ -153,17 +153,15 @@
 
   background: hsla(0, 0%, 0%, .1);                 /* Negro transparente */
   backdrop-filter: blur(12px);                       /* Efecto de vidrio */
-  -webkit-backdrop-filter: blur(12px);             /* NECESARIO para iPhone */
+  -webkit-backdrop-filter: blur(12px);               /* NECESARIO para iPhone */
 
   clip-path: circle(0px at 88% 9%);                  /* Comienza cerrado */
   transition: clip-path .5s ease-in-out;             /* Apertura suave */
   z-index: 5;
 
-  /* transform: translateZ(40px); */                      /* Mueve el panel 40px hacia adelante en el espacio 3D. El panel aparece más cerca de la cámara */ 
   transform: translate3d(0,0,1px);                   /* ARREGLA EL BUG */
   backface-visibility: hidden;
-
-  will-change: backdrop-filter, clip-path; /* ← Fuerza a Safari a recomponer bien */
+  will-change: backdrop-filter, clip-path;           /* Fuerza a Safari a recomponer bien */
 }
 
 #sec5 .info__name { 
@@ -394,6 +392,4 @@
     height: clamp(25px, 5.5vw, 40px);
     font-size: clamp(0.9rem, 2.8vw, 1.2rem);
   }
-
 }
-
