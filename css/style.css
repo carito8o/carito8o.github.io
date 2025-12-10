@@ -26,6 +26,11 @@ body.no-scroll {
   overflow: hidden !important;                             /* Quita la posibilidad de hacer scroll manual mientras se anima una transición */
 }
 
+/* evita "scroll chaining" / rebote que puede exponer la sección anterior */
+html, body, #main {
+  overscroll-behavior-y: contain; /* evita scroll chaining y rebotes que pasan a otra área */
+}
+
 /* ======================== CONTENEDOR PRINCIPAL ======================== */
 #main {
   width: 100%;
@@ -271,4 +276,5 @@ body.no-scroll {
   .navbar ul { font-size: 60%; gap: 1px; }
   .page-border {border: 7px solid}
 }
+
 
