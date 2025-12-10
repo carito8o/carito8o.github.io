@@ -196,3 +196,11 @@ body.sec5-lite #sec5-lite-bg {
 body.sec5-lite #sec5-full-bg {
   display: none !important;                          /* Se oculta el fondo FULL */
 }
+
+/* ========== SEC5 — FONDO PLANO PARA MOVILES ========== */
+@media (max-width: 700px) {                          /* En celulares: desactivar completamente FULL y LITE, solo muestra el fondo de style.css */
+  #sec5-full-bg,
+  #sec5-lite-bg {
+    display: none !important;
+  }
+}
