@@ -1,15 +1,15 @@
 * { 
-  box-sizing: border-box;                                  /* Hace que width/height incluyan padding y borde; evita cálculos extra */
-  margin: 0; 
-  padding: 0; 
+  box-sizing: border-box;                                  /* Hace que width/height incluyan padding y borde. Evita que los elementos crezcan inesperadamente */
+  margin: 0;                                               /* Quita márgenes por defecto del navegador */
+  padding: 0;                                              /* Sin esto muchos elementos tendrían espacios internos automáticos */
 }
 
-html, body { height: 100%; }                               /* Hace que <html> y <body> ocupen el 100% de la altura de la ventana, lo cual permite que las secciones fullscreen calculen bien su altura. */
+html, body { height: 100%; }                               /* Fuerza a que html y body ocupen el 100% de la altura de la ventana, lo cual permite que las secciones fullscreen calculen bien su altura */
 
 body {
-  font-family: "Nunito", sans-serif;
-  overflow-y: scroll; /* PC */
-  -webkit-overflow-scrolling: touch;                       /* Activa el “scroll suave” nativo en dispositivos iOS. */
+  font-family: "Nunito", sans-serif;                       /* Fuente global */
+  overflow-y: scroll;                                      /* Fuerza la barra de scroll visible en PC incluso cuando no se necesita */
+  -webkit-overflow-scrolling: touch;                       /* Activa el “scroll suave” nativo en dispositivos iOS */
   background: #000;
   color: #fff;
 }
@@ -29,25 +29,25 @@ body.no-scroll {
 /* ======================== CONTENEDOR PRINCIPAL ======================== */
 #main {
   width: 100%;
-  height: 100vh;
-  scroll-snap-type: y mandatory;                           /* Activa el “snap scroll”: obliga a detener el scroll en puntos definidos en el eje vertical (y). mandatory = siempre se alinea. */
-  -webkit-overflow-scrolling: touch;                       /* En iOS mejora la fluidez del scroll. */
+  height: 100vh;                                           /* Altura igual a la del viewport */
+  scroll-snap-type: y mandatory;                           /* Activa el “snap scroll”: obliga a detener el scroll en puntos definidos en el eje vertical (y). mandatory = siempre se alinea */
+  -webkit-overflow-scrolling: touch;                       /* En iOS mejora la fluidez del scroll */
 }
 
 /* ======================== SECCIONES ======================== */
 .panel {
   width: 100%;
-  min-height: calc(var(--vh, 1vh) * 100);
-  height: auto !important;
+  min-height: calc(var(--vh, 1vh) * 100);                  /* Altura completa basada en tu variable JS --vh. Se adapta mejor que 100vh cuando la barra del navegador aparece/desaparece */
+  height: auto !important;                                 /* Permite que el contenido interno crezca si necesita más espacio */
 
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   text-align: center;
-  overflow: hidden;
+  overflow: hidden;                                        /* Oculta contenido que salga del panel */
 
-  scroll-snap-align: start;                                /* Marca el “punto de encaje” para el scroll-snap:  indica que la parte superior (“start”) debe alinearse con el viewport. */
+  scroll-snap-align: start;                                /* Marca dónde debe encajar la sección al hacer snap */
 }
 
 /* Fondo de cada seccion */
@@ -58,20 +58,33 @@ body.no-scroll {
 .panel-6 { background: linear-gradient(135deg, #0a0a0a 0%, #0f1f0f 100%); color: #fff; }
 
 /* ======================== DESACTIVAR SNAP EN MÓVILES ======================== */
-@media (pointer: coarse) {
+@media (pointer: coarse) {                                 /* Se activa solo en pantallas táctiles (celulares/tablets) */
   html, body {
-    height: auto !important;
-    min-height: 100% !important;
+    height: auto !important;                               /* Quita la altura fija. Permite que html/body crezcan según el contenido, esto soluciona error de topes indeseados en los limites de la pagina en el celular */
+    min-height: 100% !important;                           /* Asegura que html/body nunca sean más pequeños que la pantalla */
   }
   #main {
-    scroll-snap-type: none !important;
-    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-y: auto !important;                           /* Activa scroll nativo del móvil */
+    scroll-snap-type: none !important;                     /* Desactiva el scroll-snap que en móviles causa límites y rebotes */
   }
   .panel {
-    min-height: 100svh !important;
-    scroll-snap-align: none !important;
+    height: auto !important;
+    min-height: 100vh !important;                          /* Usa altura real del viewport móvil */
+    scroll-snap-align: none !important;                    /* Elimina posicionamiento forzado del snap */
   }
-  .page-border { display: none !important; }
+  .panel * {
+    touch-action: pan-y !important;                        /* permite scroll vertical nativo en móviles */
+  }
+  body {
+    overflow-y: auto !important;                           /* Asegura scroll normal */
+    padding-top: 1px;                                      /* Truco para eliminar el tope superior de Safari */
+    padding-bottom: 1px;
+  }
+  .page-border {
+    display: none !important;                              /* Oculta el borde porque en móvil interfiere y causa "empujes" visuales */
+  }
 }
 
 /* ======================== SECCION INICIO (SEC1) ======================== */
@@ -271,6 +284,7 @@ body.no-scroll {
   .navbar ul { font-size: 60%; gap: 1px; }
   .page-border {border: 7px solid}
 }
+
 
 
 
