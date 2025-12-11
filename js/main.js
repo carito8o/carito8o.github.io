@@ -39,11 +39,9 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
     const border = 20;                                                          // 10px arriba + 10px abajo
     document.documentElement.style.setProperty('--vh', `${(height - border) * 0.01}px`); // escribe el 1% de la altura real en la variable CSS --vh
   }
-  updateVH();                                                                   // Ejecuta al inicio
 
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', updateVH, { passive: true }); // recalcula al cambiar tamaño del viewport visual
-    window.visualViewport.addEventListener('scroll', updateVH, { passive: true }); // recalcula si visualViewport se mueve
   } else {
     window.addEventListener('resize', updateVH, { passive: true });             // Si no existe visualViewport, al menos recalcula cuando la ventana cambia de tamaño
   }
@@ -386,10 +384,13 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
     // --------------------------------------------------------------------------
     function onResize() {
       updateVH();                                                               // recalcula la variable CSS --vh con la altura real del viewport
-      const target = getSectionByIndex(current);                                // obtiene la sección actual (la que debería permanecer a la vista)
+      if (IS_TOUCH) return;
+      if (SCROLL_ACTIVE) return;
 
-      if (IS_TOUCH) target.scrollIntoView({ behavior: "auto" });                // en movil, recolocar sección instantáneamente (evita saltos o zoom roto)
-      else gsap.set(window, { scrollTo: target });                              // en PC, GSAP recoloca sin animación para evitar quedar a medias
+      const target = panels[current];
+      if (target) {
+        target.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
     }
 
     window.addEventListener("orientationchange", () => {                        // se dispara al rotar la pantalla en móvil
@@ -457,6 +458,7 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   window.getCurrentSection = () => current;                                     // expone función para obtener sección actual
 
 })();
+
 
 
 
