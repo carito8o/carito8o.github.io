@@ -272,18 +272,14 @@ body.no-scroll {
   .page-border {border: 7px solid}
 }
 
-/* Desactivar scroll-snap en móviles */
-@media (max-width: 700px) {
-
-  html, body, main {
+@media (max-width: 768px) {
+  main {
     scroll-snap-type: none !important;
+    overflow-y: auto !important;
   }
-
   .panel {
     scroll-snap-align: none !important;
   }
-
 }
-
 
 
