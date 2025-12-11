@@ -65,7 +65,7 @@ body.no-scroll {
     -webkit-overflow-scrolling: touch;                     /* scroll fluido nativo */
   }
   .panel {
-    min-height: calc(var(--vh) * 100) !important;
+    min-height: 100dvh !important;
     height: auto !important;
     scroll-snap-align: none !important;
   }
@@ -279,6 +279,7 @@ body.no-scroll {
   .navbar ul { font-size: 60%; gap: 1px; }
   .page-border {border: 7px solid}
 }
+
 
 
 
