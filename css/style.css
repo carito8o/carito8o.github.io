@@ -34,6 +34,29 @@ body.no-scroll {
   -webkit-overflow-scrolling: touch;                       /* En iOS mejora la fluidez del scroll. */
 }
 
+/* ======================== SECCIONES ======================== */
+.panel {
+  width: 100%;
+  /* NO forzar height rígido aquí. Usamos min-height basada en --vh que actualiza JS */
+  min-height: calc(var(--vh, 1vh) * 100);                  /* Fallback para navegadores que no soportan 100dvh. Usa la variable --vh calculada por JS (altura real del viewport). Si la variable no existe, usa 1vh normal. */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  text-align: center;
+  overflow: hidden;
+
+  scroll-snap-align: start;                                /* Marca el “punto de encaje” para el scroll-snap:  indica que la parte superior (“start”) debe alinearse con el viewport. */
+}
+
+/* Fondo de cada seccion */
+.panel-2 { background: linear-gradient(135deg, #95A472, #79b95d); color: #fff; }
+.panel-3 { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #fff; }
+.panel-4 { background: #111; color: #fff; }
+.panel-5 { background: linear-gradient(135deg, #8f9e6b, #4f8339); color: #fff; }
+.panel-6 { background: linear-gradient(135deg, #0a0a0a 0%, #0f1f0f 100%); color: #fff; }
+
 /* ======================== DESACTIVAR SNAP EN MÓVILES ======================== */
 @media (min-width: 769px) {
   .panel {
@@ -58,31 +81,6 @@ body.no-scroll {
     overscroll-behavior-y: contain;
   }
 }
-
-
-/* ======================== SECCIONES ======================== */
-.panel {
-  width: 100%;
-  /* NO forzar height rígido aquí. Usamos min-height basada en --vh que actualiza JS */
-  min-height: calc(var(--vh, 1vh) * 100);                  /* Fallback para navegadores que no soportan 100dvh. Usa la variable --vh calculada por JS (altura real del viewport). Si la variable no existe, usa 1vh normal. */
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  text-align: center;
-  overflow: hidden;
-
-  scroll-snap-align: start;                                /* Marca el “punto de encaje” para el scroll-snap:  indica que la parte superior (“start”) debe alinearse con el viewport. */
-}
-
-/* Fondo de cada seccion */
-.panel-2 { background: linear-gradient(135deg, #95A472, #79b95d); color: #fff; }
-.panel-3 { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #fff; }
-.panel-4 { background: #111; color: #fff; }
-.panel-5 { background: linear-gradient(135deg, #8f9e6b, #4f8339); color: #fff; }
-.panel-6 { background: linear-gradient(135deg, #0a0a0a 0%, #0f1f0f 100%); color: #fff; }
-
 
 /* ======================== SECCION INICIO (SEC1) ======================== */
 
@@ -281,6 +279,7 @@ body.no-scroll {
   .navbar ul { font-size: 60%; gap: 1px; }
   .page-border {border: 7px solid}
 }
+
 
 
 
