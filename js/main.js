@@ -34,20 +34,17 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   // VH (soporte visualViewport si existe)
   // --------------------------------------------------------------------------
   function updateVH() {                                                         // Actualiza variable CSS --vh dependiendo del viewport real
-    if (IS_TOUCH) return; //
     const viewport = window.visualViewport;                                     // Detecta viewport real si existe
     const height = viewport ? viewport.height : window.innerHeight;             // Si existe visualViewport, usa su altura real. Si no existe (pc o navegador antiguo), usa window.innerHeight
     document.documentElement.style.setProperty('--vh', `${height * 0.01}px`);   // escribe el 1% de la altura real en la variable CSS --vh
   }
+  updateVH();                                                                   // Ejecuta al inicio
 
-  if (!IS_TOUCH) {
-    updateVH();
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', updateVH, { passive: true });
-      window.visualViewport.addEventListener('scroll', updateVH, { passive: true });
-    } else {
-      window.addEventListener('resize', updateVH, { passive: true });
-    }
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updateVH, { passive: true }); // recalcula al cambiar tamaño del viewport visual
+    window.visualViewport.addEventListener('scroll', updateVH, { passive: true }); // recalcula si visualViewport se mueve
+  } else {
+    window.addEventListener('resize', updateVH, { passive: true });             // Si no existe visualViewport, al menos recalcula cuando la ventana cambia de tamaño
   }
 
 
@@ -387,10 +384,11 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
     // RESIZE / ORIENTACIÓN DEL DISPOSITIVO
     // --------------------------------------------------------------------------
     function onResize() {
-      if (!IS_TOUCH) {
-        const target = getSectionByIndex(current);
-        gsap.set(window, { scrollTo: target });
-      }
+      updateVH();                                                               // recalcula la variable CSS --vh con la altura real del viewport
+      const target = getSectionByIndex(current);                                // obtiene la sección actual (la que debería permanecer a la vista)
+
+      if (IS_TOUCH) target.scrollIntoView({ behavior: "auto" });                // en movil, recolocar sección instantáneamente (evita saltos o zoom roto)
+      else gsap.set(window, { scrollTo: target });                              // en PC, GSAP recoloca sin animación para evitar quedar a medias
     }
 
     window.addEventListener("orientationchange", () => {                        // se dispara al rotar la pantalla en móvil
@@ -458,7 +456,6 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   window.getCurrentSection = () => current;                                     // expone función para obtener sección actual
 
 })();
-
 
 
 
