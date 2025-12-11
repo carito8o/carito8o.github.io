@@ -1,9 +1,9 @@
 export const loaderHTML = `
 <div class="loading-screen">
-  <div class="loader">
-    <div class="loader-1 bar"></div>
-  </div>
-    <div class="counter-wrapper">
+      <div class="loader">
+        <div class="loader-1 bar"></div>
+      </div>
+      <div class="counter-wrapper">
       <div class="counter">
         <div class="counter-1 digit">
           <div class="num">0</div>
@@ -21,6 +21,7 @@ export const loaderHTML = `
           <div class="num">8</div>
           <div class="num">9</div>
           <div class="num">0</div>
+					
         </div>
         <div class="counter-3 digit">
           <div class="num">0</div>
@@ -32,17 +33,20 @@ export const loaderHTML = `
           <div class="num">6</div>
           <div class="num">7</div>
           <div class="num">8</div>
-          <div class="num">9</div>	
+          <div class="num">9</div>
+					
         </div>
 				<div class="counter-4 digit">
           <div class="num">%</div>
+          
+					
         </div>
       </div>
       <div class="spinner-wrapper">
-        <div class="spinner-icon"></div>
-      </div>
+      <div class="spinner-icon"></div>
     </div>
-</div>
+    </div>
+    </div>
 `;
 
 
