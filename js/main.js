@@ -47,26 +47,6 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
     window.addEventListener('resize', updateVH, { passive: true });             // Si no existe visualViewport, al menos recalcula cuando la ventana cambia de tamaño
   }
 
-  // ==========================================================================
-  // FIX: espacio extra al final en móviles (evita el "tope" o rebote incorrecto)
-  // ==========================================================================
-  function fixMobileBottomBounce() {
-    if (!IS_TOUCH) return;                                                      // Solo móviles/tabletas táctiles
-
-    const vh = window.visualViewport?.height || window.innerHeight;
-
-    const extra = Math.max(20, vh * 0.04);                                      // Preciso en móviles
-    document.body.style.paddingBottom = extra + "px";                           // Agrega espacio real bajo la página
-  }
-
-  // Ejecutarlo SIEMPRE después de recalcular el vh real
-  window.addEventListener("resize", fixMobileBottomBounce);
-  window.addEventListener("orientationchange", () => setTimeout(fixMobileBottomBounce, 200));
-  window.addEventListener("DOMContentLoaded", () => {
-    updateVH();
-    fixMobileBottomBounce();
-  });
-  fixMobileBottomBounce();
 
   // --------------------------------------------------------------------------
   // Obtener sección por índice y calcular progreso
@@ -476,6 +456,7 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   window.getCurrentSection = () => current;                                     // expone función para obtener sección actual
 
 })();
+
 
 
 
