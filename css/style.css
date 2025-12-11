@@ -70,6 +70,9 @@ body.no-scroll {
   body {
     overflow-y: auto !important;
   }
+  .page-border {
+    display: none !important;
+  }
 }
 
 /* ======================== SECCION INICIO (SEC1) ======================== */
@@ -234,17 +237,10 @@ body.no-scroll {
 .page-border {
   position: fixed;                                          /* Siempre visible, fija en pantalla */
   inset: 0px;                                               /* Ocupa toda la pantalla */
-  outline: 10px solid white;
-  outline-offset: -10px;
+  border: 10px solid white;                               /* Marco blanco alrededor */
   background: transparent;                                  /* Sin relleno */
   pointer-events: none;                                     /* No bloquea clics ni scroll */
   z-index: 9999;
-}
-
-@supports (-webkit-touch-callout: none) {                   /* Esto fuerza a iOS a mantener el borde pegado al viewport más rápido */
-  .page-border {
-    position: fixed;
-  }
 }
 
 /* ======================== BARRA DE PROGRESO ======================== */
@@ -276,6 +272,7 @@ body.no-scroll {
   .navbar ul { font-size: 60%; gap: 1px; }
   .page-border {border: 7px solid}
 }
+
 
 
 
