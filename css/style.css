@@ -74,6 +74,8 @@ body.no-scroll {
   }
   body {
     overflow-y: auto !important;
+    padding-top: 1px;
+    padding-bottom: 1px;
   }
   .page-border {
     display: none !important;
@@ -277,6 +279,7 @@ body.no-scroll {
   .navbar ul { font-size: 60%; gap: 1px; }
   .page-border {border: 7px solid}
 }
+
 
 
 
