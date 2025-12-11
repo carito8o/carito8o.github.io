@@ -38,7 +38,7 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-	
+  top: 0 !important;
 }
 
 .num1offset1 {
@@ -77,11 +77,12 @@
 }
 
 .spinner-wrapper {
+  position: absolute;  /* relativo al .counter */
   width: 35px;
   height: 35px;
   margin-left: 25px;
   position: relative;
-  top: 10px;
+  top: 30%;
 
   opacity: 0;
   transform: scale(0.5);
@@ -197,6 +198,7 @@ body.preloader .loading-screen {
     top: 5px;
   }
 }
+
 
 
 
