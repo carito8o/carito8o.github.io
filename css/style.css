@@ -60,7 +60,7 @@ body.no-scroll {
 /* ======================== DESACTIVAR SNAP EN MÓVILES ======================== */
 @media (pointer: coarse) {                                 /* pointer: coarse = pantallas táctiles: teléfonos y tablets */
   #main {
-    overflow: visible !important;
+    overflow-y: auto !important;
     scroll-snap-type: none !important;                     /* sin snap en móviles */
     -webkit-overflow-scrolling: touch;                     /* scroll fluido nativo */
   }
@@ -272,6 +272,7 @@ body.no-scroll {
   .navbar ul { font-size: 60%; gap: 1px; }
   .page-border {border: 7px solid}
 }
+
 
 
 
