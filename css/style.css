@@ -53,7 +53,7 @@ body.no-scroll {
 /* ======================== SECCIONES ======================== */
 .panel {
   width: 100%;
-  height: 100dvh;                                          /* Altura usando unidad dinámica real del viewport (incluye zoom y barras del navegador) */
+  /* NO forzar height rígido aquí. Usamos min-height basada en --vh que actualiza JS */
   min-height: calc(var(--vh, 1vh) * 100);                  /* Fallback para navegadores que no soportan 100dvh. Usa la variable --vh calculada por JS (altura real del viewport). Si la variable no existe, usa 1vh normal. */
 
   display: flex;
@@ -73,6 +73,32 @@ body.no-scroll {
 .panel-5 { background: linear-gradient(135deg, #8f9e6b, #4f8339); color: #fff; }
 .panel-6 { background: linear-gradient(135deg, #0a0a0a 0%, #0f1f0f 100%); color: #fff; }
 
+/* Solo en pantallas grandes: forzamos el fullscreen (snap behavior deseado en desktop) */
+@media (min-width: 769px) {
+  .panel {
+    height: 100dvh;
+  }
+  main { scroll-snap-type: y mandatory; }
+}
+
+/* MÓVIL: quitar snap, permitir flujo natural y atenuar overscroll */
+@media (max-width: 768px) {
+  main { 
+    scroll-snap-type: none !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .panel {
+    height: auto; /* deja que la sección fluya; min-height asegura pantalla mínima */
+  }
+
+  /* Evitar rebotes/propagación de overscroll en navegadores que lo soportan */
+  html, body, main {
+    overscroll-behavior-y: contain; /* evita que el "rubber-band" se propague al root */
+    -webkit-overflow-scrolling: touch;
+  }
+}
 
 /* ======================== SECCION INICIO (SEC1) ======================== */
 
@@ -271,15 +297,4 @@ body.no-scroll {
   .navbar ul { font-size: 60%; gap: 1px; }
   .page-border {border: 7px solid}
 }
-
-@media (max-width: 768px) {
-  main {
-    scroll-snap-type: none !important;
-    overflow-y: auto !important;
-  }
-  .panel {
-    scroll-snap-align: none !important;
-  }
-}
-
 
