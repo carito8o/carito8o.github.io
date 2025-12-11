@@ -59,14 +59,19 @@ body.no-scroll {
 
 /* ======================== DESACTIVAR SNAP EN MÓVILES ======================== */
 @media (pointer: coarse) {                                 /* pointer: coarse = pantallas táctiles: teléfonos y tablets */
+  html, body {
+    height: auto !important;
+    min-height: 100% !important;
+  }
   #main {
+    height: auto !important;
+    min-height: 100% !important;
     overflow-y: auto !important;
-    scroll-snap-type: none !important;                     /* sin snap en móviles */
-    -webkit-overflow-scrolling: touch;                     /* scroll fluido nativo */
+    scroll-snap-type: none !important;
   }
   .panel {
-    min-height: 100dvh !important;
     height: auto !important;
+    min-height: 100vh !important;
     scroll-snap-align: none !important;
   }
   .panel * {
@@ -279,6 +284,7 @@ body.no-scroll {
   .navbar ul { font-size: 60%; gap: 1px; }
   .page-border {border: 7px solid}
 }
+
 
 
 
