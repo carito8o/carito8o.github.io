@@ -37,7 +37,8 @@ body.no-scroll {
 /* ======================== SECCIONES ======================== */
 .panel {
   width: 100%;
-  height: calc(var(--vh, 1vh) * 100);
+  min-height: calc(var(--vh, 1vh) * 100);
+  height: auto !important;
 
   display: flex;
   align-items: center;
@@ -64,6 +65,7 @@ body.no-scroll {
     -webkit-overflow-scrolling: touch;                     /* scroll fluido nativo */
   }
   .panel * {
+    scroll-snap-align: none !important;
     touch-action: pan-y !important;                        /* permite scroll vertical nativo en móviles */
   }
   body {
@@ -271,6 +273,7 @@ body.no-scroll {
   .navbar ul { font-size: 60%; gap: 1px; }
   .page-border {border: 7px solid}
 }
+
 
 
 
