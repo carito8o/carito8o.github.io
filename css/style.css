@@ -58,33 +58,20 @@ body.no-scroll {
 .panel-6 { background: linear-gradient(135deg, #0a0a0a 0%, #0f1f0f 100%); color: #fff; }
 
 /* ======================== DESACTIVAR SNAP EN MÓVILES ======================== */
-@media (pointer: coarse) {                                 /* pointer: coarse = pantallas táctiles: teléfonos y tablets */
+@media (pointer: coarse) {
   html, body {
     height: auto !important;
     min-height: 100% !important;
   }
   #main {
-    height: auto !important;
-    min-height: 100% !important;
-    overflow-y: auto !important;
     scroll-snap-type: none !important;
+    overflow-y: auto !important;
   }
   .panel {
-    height: auto !important;
-    min-height: 100vh !important;
+    min-height: 100svh !important;
     scroll-snap-align: none !important;
   }
-  .panel * {
-    touch-action: pan-y !important;                        /* permite scroll vertical nativo en móviles */
-  }
-  body {
-    overflow-y: auto !important;
-    padding-top: 1px;
-    padding-bottom: 1px;
-  }
-  .page-border {
-    display: none !important;
-  }
+  .page-border { display: none !important; }
 }
 
 /* ======================== SECCION INICIO (SEC1) ======================== */
@@ -284,6 +271,7 @@ body.no-scroll {
   .navbar ul { font-size: 60%; gap: 1px; }
   .page-border {border: 7px solid}
 }
+
 
 
 
