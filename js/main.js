@@ -385,10 +385,10 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
     // --------------------------------------------------------------------------
     function onResize() {
       updateVH();                                                               // recalcula la variable CSS --vh con la altura real del viewport
-      const target = getSectionByIndex(current);                                // obtiene la sección actual (la que debería permanecer a la vista)
-
-      if (IS_TOUCH) target.scrollIntoView({ behavior: "auto" });                // en movil, recolocar sección instantáneamente (evita saltos o zoom roto)
-      else gsap.set(window, { scrollTo: target });                              // en PC, GSAP recoloca sin animación para evitar quedar a medias
+      if (!IS_TOUCH) {
+        const target = getSectionByIndex(current);
+        gsap.set(window, { scrollTo: target });
+      }
     }
 
     window.addEventListener("orientationchange", () => {                        // se dispara al rotar la pantalla en móvil
@@ -456,6 +456,7 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   window.getCurrentSection = () => current;                                     // expone función para obtener sección actual
 
 })();
+
 
 
 
