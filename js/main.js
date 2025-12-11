@@ -34,10 +34,9 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   // VH (soporte visualViewport si existe)
   // --------------------------------------------------------------------------
   function updateVH() {                                                         // Actualiza variable CSS --vh dependiendo del viewport real
-    const viewport = window.visualViewport;                                     // Detecta viewport real si existe
+    const viewport = window.visualViewport;                                     // Detecta viewport real (si existe) visible en móviles (excluye barra de navegación, teclado, zoom, etc)
     const height = viewport ? viewport.height : window.innerHeight;             // Si existe visualViewport, usa su altura real. Si no existe (pc o navegador antiguo), usa window.innerHeight
-    const border = 20;                                                          // 10px arriba + 10px abajo
-    document.documentElement.style.setProperty('--vh', `${(height - border) * 0.01}px`); // escribe el 1% de la altura real en la variable CSS --vh
+    document.documentElement.style.setProperty('--vh', `${height * 0.01}px`);   // escribe el 1% de la altura real en la variable CSS --vh
   }
 
   if (window.visualViewport) {
@@ -384,12 +383,11 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
     // --------------------------------------------------------------------------
     function onResize() {
       updateVH();                                                               // recalcula la variable CSS --vh con la altura real del viewport
-      if (IS_TOUCH) return;
-      if (SCROLL_ACTIVE) return;
+      if (IS_TOUCH) return;                                                     // en móviles no se reencaja automáticamente la sección actual para evitar saltos/forzados
 
-      const target = panels[current];
+      const target = panels[current];                                           // Obtiene la sección actual basándose en el índice current
       if (target) {
-        target.scrollIntoView({ behavior: 'auto', block: 'start' });
+        target.scrollIntoView({ behavior: 'auto', block: 'start' });            // Reacomoda la pantalla para que la sección actual quede alineada arriba
       }
     }
 
@@ -458,6 +456,7 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   window.getCurrentSection = () => current;                                     // expone función para obtener sección actual
 
 })();
+
 
 
 
