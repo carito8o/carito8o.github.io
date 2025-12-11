@@ -272,14 +272,4 @@ body.no-scroll {
   .page-border {border: 7px solid}
 }
 
-@media (max-width: 800px) {
-  html, body {
-    scroll-snap-type: none !important;
-  }
-  .panel {
-    scroll-snap-align: none !important;
-  }
-}
-
-
 
