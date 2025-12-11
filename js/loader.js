@@ -240,10 +240,18 @@ function finalizarLoader() {
     duration: 0.6,
     ease: "power2.out"
   }, "-=0.5") // aparece un poco antes de que desaparezca el preloader
-  
+
+  // desaparecer counter-wrapper (dígitos + spinner)
+  .to(".counter-wrapper", {
+    opacity: 0,
+    duration: 0.4,
+    ease: "power2.inOut"
+  }, "-=0.4")
+      
   .to(".loading-screen", {
     opacity: 0,
     duration: 0.6,
     ease: "power1.inOut"
   });
 }
+
