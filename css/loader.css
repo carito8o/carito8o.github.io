@@ -38,7 +38,7 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  transform: translateY(-15px);
+  transform: translateY(-20px);
 	
 }
 
@@ -198,4 +198,5 @@ body.preloader .loading-screen {
     top: 5px;
   }
 }
+
 
