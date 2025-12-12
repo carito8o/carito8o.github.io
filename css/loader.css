@@ -75,7 +75,7 @@
 .loader-1 {
   position: relative;
   background: #95A472;
-  width: 100%;
+  width: 0%;
 	overflow: hidden;
 }
 
@@ -200,6 +200,7 @@ body.preloader .loading-screen {
     transform: scale(0.55);
   }
 }
+
 
 
 
