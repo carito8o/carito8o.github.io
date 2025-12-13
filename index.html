@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="format-detection" content="telephone=no"> <!-- Hace que los celulares no pongan el numero de telefono como un enlace feo azul -->
   <title>GIGAZER</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"> <!-- fuente de google "Nunito" -->
@@ -35,14 +34,40 @@
 <body class="preloader">
   
   <nav class="navbar">
-    <ul>
-      <!-- data-index se usa en main.js para ir a la sección correcta -->
+
+    <!-- BOTÓN HAMBURGUESA (SOLO MÓVIL) -->
+    <button class="nav-toggle" aria-label="Abrir menú">
+      <i class="ri-menu-3-line"></i>
+    </button>
+
+    <!-- MENÚ DESKTOP (el que ya estaba) -->
+    <ul class="nav-links">
       <li><a href="#sec1" data-index="0">INICIO</a></li>
       <li><a href="#sec2" data-index="1">PROYECTOS</a></li>
       <li><a href="#sec3" data-index="2">SERVICIOS</a></li>
       <li><a href="#sec4" data-index="3">NOSOTROS</a></li>
       <li><a href="#sec6" data-index="5">CONTACTO</a></li>
     </ul>
+
+    <!-- MENÚ MÓVIL -->
+    <div class="mobile-menu">
+
+      <button class="close-menu" aria-label="Cerrar menú">
+        <i class="ri-close-line"></i>
+      </button>
+
+      <ul>
+        <li><a href="#sec1" data-index="0">INICIO</a></li>
+        <li><a href="#sec2" data-index="1">PROYECTOS</a></li>
+        <li><a href="#sec3" data-index="2">SERVICIOS</a></li>
+        <li><a href="#sec4" data-index="3">NOSOTROS</a></li>
+        <li><a href="#sec6" data-index="5">CONTACTO</a></li>
+      </ul>
+    </div>
+
+    <!-- FONDO OSCURO PARA BLOQUEAR INTERACCIÓN -->
+    <div class="nav-overlay"></div>
+
   </nav>
 
   <div class="page-border"></div> <!-- Borde blanco -->
@@ -256,6 +281,8 @@
 
   <script type="module" src="../js/main.js"></script>
   <script type="module" src="../js/utilidades/conTab.js"></script>
+  <script src="../js/navbar-mobile.js"></script>
+
   
   <script type="module" src="../../js/secciones/sec1-inicio.js"></script>
   <script type="module" src="../../js/secciones/sec2-modelo3d.js"></script>
@@ -267,7 +294,6 @@
 
 </body>
 </html>
-
 
 
 
