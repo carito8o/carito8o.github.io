@@ -1,27 +1,45 @@
 /* ======================================================== FONDO ANIMADO SEC5 ========================================================  */
+/*
+- Fondo FULL (animado, pesado, GPU)
+- Fondo LITE (animado, pero machucho)
+- Fondo plano (móvil)
+*/
 
 /* ========== Fondo full ========== */
 
 .sec5-bg-animated {
-  position: absolute;
+  position: absolute;                                /* Saca el fondo del flujo normal y lo posiciona respecto a #sec5 */
   inset: 0;                                          /* Ocupa todo el ancho y alto de la sección */
   z-index: 0;
   overflow: hidden;
   background: linear-gradient(40deg, rgb(0, 9, 35), rgb(0, 23, 70));
+  will-change: transform;
+  contain: layout paint;                             /* Aísla el layout y repintado SOLO dentro de este contenedor, para que no afecte a toda la pagina */
 }
 
-.sec5-bg-animated svg {
+#sec5 .sec5-bg-animated * {                          /* Por defecto: animaciones pausadas (para que no funcionen fuera de sec5) */
+  animation-play-state: paused;
+}
+
+body.sec5-active #sec5 .sec5-bg-animated * {         /* Solo cuando la sección está activa */
+  animation-play-state: running;
+}
+
+.sec5-bg-animated svg {                              /* SVG usado SOLO para el filtro gooey */
   position: absolute;
-  width: 0;
+  width: 0;                                          /* El SVG no es visible, solo define filtros. Si se quita, el filtro gooey deja de existir */
   height: 0;
 }
 
-/* Contenedor del efecto gooey */
-.sec5-bg-animated .gradients-container {
-  filter: url(#gooSec5) blur(40px);                  /* Aplica el filtro goo + difuminado */
+.sec5-bg-animated .gradients-container {             /* Contenedor que agrupa todas las burbujas */
+  filter: url(#gooSec5) blur(40px);                  /* Aplica el filtro SVG + desenfoque */
   width: 100%;
   height: 100%;
   position: relative;
+}
+
+.gradients-container {                               /* Optimización específica del filtro */
+  will-change: filter;                               /* Le avisa al navegador que el filtro cambiará */
 }
 
 /* Variables de color y comportamiento */
@@ -34,11 +52,11 @@
   --s5-interactive: 140, 100, 255;                   /* Color de la burbuja que sigue al mouse */
 
   --s5-circle-size: 80%;                             /* Tamaño base de las burbujas */
-  --s5-blending: hard-light;                         /* Modo de mezcla visual */
+  --s5-blending: hard-light;                         /* Modo de mezcla visual entre burbujas */
 }
 
 /* Animaciones base para los blobs FULL */
-@keyframes s5-moveInCircle {                         /* Movimiento circular */
+@keyframes s5-moveInCircle {                         /* Rotación continua */
   0% { transform: rotate(0deg); }
   50% { transform: rotate(180deg); }
   100% { transform: rotate(360deg); }
@@ -62,11 +80,11 @@
 .sec5-bg-animated .g3,
 .sec5-bg-animated .g4,
 .sec5-bg-animated .g5 {
-  position: absolute;
+  position: absolute;                                /* Permite superposición libre */
   width: var(--s5-circle-size);
   height: var(--s5-circle-size);
   mix-blend-mode: var(--s5-blending);                /* Se mezclan entre sí */
-  opacity: 0.9;
+  opacity: 0.9;                                      /* Transparencia base */
   background: radial-gradient(circle, rgba(var(--s5-color1),0.8) 0%, rgba(var(--s5-color1),0) 50%);
   top: 10%;
   left: 10%;
@@ -100,7 +118,7 @@
   animation: s5-moveInCircle 20s ease infinite;
 }
 
-/* Elemento (burbuja) interactivo (sigue el mouse) */
+/* Burbuja interactiva (sigue al mouse) */
 .sec5-bg-animated .interactive {
   position: absolute;
   width: 160%;
@@ -112,15 +130,15 @@
   opacity: 0.6;
   transition: transform 0.2s linear;                 /* Suavidad del seguimiento */
   pointer-events: none;                              /* No interfiere con clics */
+  will-change: transform;
 }
 
-/* Asegurar que el contenido quede encima */
-#sec5 .content {
+#sec5 .content {                                     /* Asegurar que el contenido quede encima */
   position: relative;
   z-index: 10;
 }
 
-/* ========== SEC5 — FONDO LITE OPTIMIZADO ========== */
+/* ========== SEC5 — FONDO LITE (cuando no hay GPU) ========== */
 
 #sec5-lite-bg {
   display: none;                                     /* Solo se activa con .sec5-lite */
@@ -131,7 +149,7 @@
   background: linear-gradient(135deg, #8f9e6b, #4f8339);
 }
 
-/* ---- BLOBS ---- */
+/* ---- burbujas ---- */
 #sec5-lite-bg .blob {
   position: absolute;
   width: 900px;
@@ -159,7 +177,7 @@
   left: 55%;
 }
 
-/* ---- Animación ---- */
+/* ---- Animaciones LITE ---- */
 
 #sec5-lite-bg .blob.b1 {
   animation-name: blobFloat1;
