@@ -272,36 +272,43 @@ export function initSec5() {
       requestAnimationFrame(animateBubble);                                            // Repite la animación cada frame del navegador
     }
 
-    function enable() {                                                                // Activa el modo animado al entrar en la sección
-      if (running) return;                                                             // Si ya está activo, no lo repite
+    let firstMouseMove = false;                                                        // Marca si el usuario ya movió el mouse al menos una vez dentro de sec5 (por cada vez que se vuelve a entrar)
+
+    function enable() {
       running = true;
-      mouseTracking = true;
-      animateBubble();
+      mouseTracking = false;
+      firstMouseMove = false;                                                          // Reinicia el estado cada vez que entras a la sección
     }
 
     function disable() {                                                               // Desactiva la animación al salir de la sección
       running = false;
       mouseTracking = false;
-      bubble.style.transform = "";                                                     // Resetea posición visual de la burbuja
+      firstMouseMove = false;                                                          // Reinicia estado para la próxima entrada.
+      bubble.style.transform = "";                                                     // Resetea posición css de la burbuja
     }
 
     window.addEventListener("sectionChange", (e) => {                                  // Activación por cambio de sección
       const active = e.detail.current === 4;                                           // sec5 = index 4
+      document.body.classList.toggle("sec5-active", active);                           // Sincroniza JS → CSS, para que el fondo se pause
       if (active) enable();                                                            // Entra → activa animación
       else disable();                                                                  // Sale → detiene animación
     });
 
 
     window.addEventListener("mousemove", (e) => {
-      if (!mouseTracking) return;                                                      // Si la burbuja no está activa → no hacemos nada
+      if (!running) return;
 
+      if (!firstMouseMove) {
+        firstMouseMove = true;
+        mouseTracking = true;
+        animateBubble();                                                               // Arranca requestAnimationFrame solo cuando hace falta
+      }
+
+      if (!mouseTracking) return;                                                      // Si la burbuja no está activa → no hacemos nada
       const rect = sec5.getBoundingClientRect();                                       // Tamaño y posición de la sección en pantalla
       targetX = e.clientX - (rect.left + rect.width / 2);                              // Calcula desplazamiento horizontal desde el centro de sec5
       targetY = e.clientY - (rect.top + rect.height / 2);                              // Igual para vertical
     });
   }
 }
-
-
-
 
