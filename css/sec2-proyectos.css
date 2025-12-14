@@ -12,6 +12,7 @@
   border-radius: 10px;
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
   transition: transform 0.4s ease, box-shadow 0.4s ease;
+  transform: translateY(0);
 }
 
 #model-container:hover {
@@ -21,6 +22,7 @@
 }
 
 #model-container.expanded {
+  transform: translateY(-3rem);
   touch-action: none;                                       /* le dice al navegador que no haga gestos de pan/scroll/zoom nativos aquí */
   pointer-events: auto;                                     /* aseguramos que el contenedor siga recibiendo eventos */
   z-index: 20;
@@ -160,3 +162,4 @@
   }
 
 }
+
