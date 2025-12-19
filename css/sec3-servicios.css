@@ -22,7 +22,6 @@
   position: relative;                                       /* Necesario para posicionar el texto */
   overflow: hidden;
   perspective: 1000px;                                      /* ayuda a la estabilidad del render... no es 3D, pero fuerza a que el navegador trabaje mejor */
-  display: flex;
   align-items: stretch;                                     /* para que video llene su columna verticalmente si es posible */
   min-height: 45vh;
 }
@@ -256,3 +255,4 @@
     font-size: clamp(0.8rem, 2.8vw, 2.3rem);
   }
 }
+
