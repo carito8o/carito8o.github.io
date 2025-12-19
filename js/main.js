@@ -1,5 +1,5 @@
 import { gsap } from "gsap";
-gsap.registerPlugin(ScrollToPlugin);                                            // Activa el plugin ScrollTo para scroll animado
+gsap.registerPlugin(ScrollToPlugin);                                            // Activa ScrollToPlugin para controlar el scroll del viewport con GSAP (snap por sección)
 
 import { initSec1 } from "./secciones/sec1-inicio.js";
 import { initSec2 } from "./secciones/sec2-modelo3d.js";
@@ -64,7 +64,8 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   // - En Moviles: usamos scroll nativo (scrollIntoView) para respetar zoom/pinch/gestos
   // --------------------------------------------------------------------------
 
-  function goTo(idx) {                                                          // función principal que mueve la vista a la sección idx con animación GSAP y lógica según dispositivo
+  // función principal que mueve la vista a la sección idx con animación GSAP y lógica según dispositivo
+  function goTo(idx, source = "default") {                                      // source = "default" indica desde dónde se originó la navegación. Si el parámetro no se pasa, js asigna "default" (rueda, teclado, autosnap) automáticamente; la alternativa es nav, que tiene su propia animación
 
     const modal = document.getElementById("mail-modal");                        // ventanita de opciones de emails de la sec6
     if (modal) modal.style.display = "none";                                    // si existe, lo oculta inmediatamente (cuando se sale de sec6, se cierra)
@@ -83,11 +84,16 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
 
     // ------------------ MODO DESKTOP → GSAP snap -------------------------
     isAnimating = true;                                                         // bloquea nuevos gestos hasta que termine la animación
+    
+    const isNav = source === "nav";
+
+    const duration = isNav ? 0.75 : 0.35;                                       // si el cambio viene de nav, dura 0.75 seg, sino 0.35
+    const ease = isNav ? "power3.inOut" : "power2.out";
 
     gsap.to(window, {                                                           // usa GSAP + ScrollToPlugin para animar el scroll del viewport hacia el elemento "target"
       scrollTo: { y: target, autoKill: false },                                 // "y: target" indica que ScrollTo calculará la posición de ese elemento; autoKill:false evita que la animación se interrumpa si el usuario hace scroll durante la animación
-      duration: 0.35,                                                           // duración de la animación al cambiar de una sección a otra
-      ease: "power2.out",
+      duration,                                                                 // duración de la animación al cambiar de una sección a otra
+      ease,
 
       onUpdate: () => {                                                         // Mover barra de progreso MIENTRAS se anima
         const scrollY = window.scrollY;                                         // lee la posición actual del scroll del documento
@@ -190,7 +196,7 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
 
       if (delta > 0) goTo(current + 1);                                         // si delta positivo → bajar a la siguiente sección
       else goTo(current - 1);                                                   // si delta negativo → subir a la sección anterior
-    }, { passive: false });                                                     // passive:true permite al navegador optimizar el scroll
+    }, { passive: false });                                                     // passive:false es necesario para poder usar preventDefault()
 
 
     // ---------- Touch para PC híbridos (sin afectar móviles) ----------
@@ -358,8 +364,8 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
           const idx = parseInt(a.dataset.index);                                // convertir el data-index a número entero
           const target = getSectionByIndex(idx);
 
-          if (IS_TOUCH) target?.scrollIntoView({ behavior: "smooth", block: "start" }); // en móvil, usar scroll nativo para no romper zoom
-          else goTo(idx);                                                       // en PC → usar lógica GSAP
+          if (IS_TOUCH) target?.scrollIntoView({ behavior: "smooth", block: "start" }); // en móvil, usar scroll nativo (no GSAP) para respetar gestos táctiles y zoom
+          else goTo(idx, "nav");                                                // en PC, usar lógica GSAP, indicando cambio desde el nav
         });
       });
     }
@@ -456,14 +462,6 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   window.getCurrentSection = () => current;                                     // expone función para obtener sección actual
 
 })();
-
-
-
-
-
-
-
-
 
 
 
