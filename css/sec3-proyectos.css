@@ -1,0 +1,201 @@
+/* ======================== MODELO 3D ======================== */
+#model-container {
+  width: 900px;
+  height: 60vh;
+  margin: 0 auto;
+  position: relative;                                       /* Necesario para el botón cerrar */
+  background: transparent;
+  cursor: pointer;
+  border: 3px solid rgba(200, 224, 135, 0.6);
+  overflow: hidden;                                         /* evita que el canvas sobresalga */
+
+  border-radius: 10px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  transform: translateY(0);
+}
+
+#model-container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+
+}
+
+#close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
+  user-select: none;                                        /* No seleccionable */
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+#close-btn::before {
+  content: "✕";
+  display: block;
+  transform: translateY(4px); /* 🔑 AJUSTE ÓPTICO */
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+#close-btn:hover {
+  background: rgba(255, 0, 0, 0.8);
+}
+
+.servicio-expandido--3d h1 {
+  will-change: transform, opacity;
+  font-family: 'Instrument Sans', sans-serif;
+
+  font-weight: 700;
+  color: #fff;                                            /* por si el navegador no puede mostrar un degradado */
+  background: linear-gradient(90deg, #fff, #c8e087);
+  -webkit-background-clip: text;                            /* Recorta el fondo del elemento para que sólo se vea dentro de las letras */
+  -webkit-text-fill-color: transparent;                     /* Hace el texto transparente, pero no invisible, porque ahora el color real es el background */
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.btn-sec2 {
+  margin-top: 1rem;                                         /* lo separa del modelo */
+  display: inline-block;
+  position: relative;                                       /* asegura que no quede bajo el canvas */
+  font-weight: 600;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.btn-sec2:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+
+/* "Toca para interactuar" */
+#model-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: "Poppins", sans-serif;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);                               /* Efecto vidrio */
+  padding: 6px 12px;
+  border-radius: 20px;
+  animation: pulse 3s infinite;                             /* Animación de latido */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 10;
+}
+
+@keyframes pulse {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  #model-container {
+    width: 80vw;
+    height: 60vh;
+    max-width: 900px;
+  }
+  #sec3 .btn-sec2 {
+    font-size: clamp(1rem, 3vw, 2.5rem);
+    padding: 0.8rem 1.2rem;
+    margin-top: 25px;
+  }
+  #model-hint {
+    font-size: clamp(0.5rem, 2.5vw, 2rem);
+  }
+}
+
+@media (max-width: 768px) {
+  #model-container {
+    width: 94vw;
+    height: 65vh;
+    min-height: 240px;
+  }
+  .panel-3 h1 {
+    font-size: 3rem;
+  }
+  #sec3 .btn-sec2 {
+    font-size: clamp(1rem, 3vw, 2.5rem);
+    padding: 0.8rem 1.2rem;
+    margin-top: 20px;
+  }
+  #model-hint {
+    font-size: clamp(0.5rem, 2.5vw, 2rem);
+  }
+}
+
+@media (max-width: 430px) {
+  #model-container {
+    width: 94vw;
+    height: 65vh;
+    min-height: 240px;
+  }
+  .panel-3 h1 {
+    font-size: 3rem;
+  }
+  #sec3 .btn-sec2 {
+    font-size: clamp(1rem, 3vw, 2.5rem);
+    padding: 0.8rem 1.2rem;
+    margin-top: 20px;
+  }
+  #model-hint {
+    font-size: clamp(0.9rem, 2.9vw, 2.4rem);
+  }
+}
+.servicio-expandido--3d {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.servicio-3d-wrapper {
+  display: flex;
+  flex-direction: column;   /* 🔑 */
+  align-items: center;
+  gap: 1.2rem;
+  position: relative;
+}
+
+.servicio-3d-wrapper.is-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+#model-container.is-expanded {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: min(1100px, 90vw);
+  height: 70vh;
+}
+
+.servicio-expandido--3d {
+  isolation: isolate;
+}
+#overlay-3d-root {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  pointer-events: none;
+}
+
