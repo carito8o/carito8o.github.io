@@ -23,6 +23,7 @@
 
 .panel-6 .contact-title {
   font-size: 2.8rem;
+  font-family: 'Instrument Sans', sans-serif;
   background: linear-gradient(90deg, #7ED957, #c8e087);
   -webkit-background-clip: text;                            /* Hace que el gradiente sea visible únicamente en el texto */
   -webkit-text-fill-color: transparent;
