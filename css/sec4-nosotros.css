@@ -1,49 +1,104 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;600;700&display=swap"); /* fuente de las cartas */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap");
 
 /* ================= SECCIÓN NOSOTROS (seccion 4) ================= */
 
 #sec4 .circle-bg {
   position: absolute;                                /* Se coloca detrás del contenido */
   top: 50%; left: 50%;                               /* Lo posicionamos en el centro */
-  width: 88vw; height: 76vh;
-  max-width: 100%; max-height: 100%;
+  transform: translate(-50%, -50%);                  /* empieza escondido */
+
+  width: clamp(60vw, 85vw, 92vw);
+  height: clamp(55vh, 72vh, 88vh);
+
   background: #7ED957;
   border-radius: 30%;
-  transform: translate(-50%, -50%);                  /* empieza escondido */
   z-index: 0;                                        /* Debajo del contenido */
 }
 
 #sec4 .nosotros__contenido {
   position: relative;                                /* Para permitir z-index */
   z-index: 2;                                        /* encima del círculo */
-  margin: 0 auto;
-  text-align: center;
-  color: #fff;
-  max-width: 75%;
-  max-height: 80%;
-  padding: 5%;
-  box-sizing: border-box;                            /* Incluye el padding dentro del tamaño */
+
+  max-width: 82%;
+  max-height: 85%;
+  
+  margin-inline: auto;
+  padding: clamp(1rem, 3.5vw, 3rem);
+  color: #ffffff;
 
   display: flex;                                     /* Centra verticalmente el texto interno */
-  flex-direction: column;                            /* Elementos en columna */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 
+  text-align: center;
+  box-sizing: border-box;                            /* Incluye el padding dentro del tamaño */
   overflow: hidden;                                  /* Evita desbordes del texto en el circulo */
 }
 
+#sec4 .title-aurora {
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 800;
+
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+
+  margin-bottom: 1.5rem;
+  color: #ffffff;                                  /* Fallback inmediato */
+
+  /* AURORA */
+  background-image:
+    radial-gradient(circle at 20% 30%, #6057d9 0%, transparent 55%),
+    radial-gradient(circle at 80% 20%, #ff833c 0%, transparent 55%),
+    radial-gradient(circle at 50% 80%, #ff00d4 0%, transparent 55%),
+    radial-gradient(circle at 70% 60%, #5abdff 0%, transparent 55%);
+
+  background-size: 200% 200%;
+  animation: auroraText 10s ease-in-out infinite;
+  animation-play-state: paused;
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+@keyframes auroraText {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 #sec4 .nosotros__contenido h1 {
-  font-size: clamp(1.5rem, 5vw, 2.5rem);             /* Tamaño flexible según pantalla. Minimo 1.5, maximo 2.5, preferiblemente 5 */
-  margin-bottom: 1rem;
-  line-height: 1.2;
+  font-size: clamp(2rem, 5.5vw, 3rem);             /* Tamaño flexible según pantalla. Minimo 2, maximo 3, preferiblemente 5.5 */
 }
 
 #sec4 .nosotros__contenido p {
-  font-size: clamp(0.9rem, 3.5vw, 1.2rem);
+  max-width: 78ch;
+  font-size: clamp(1rem, 2.2vw, 1.35rem);
   line-height: 1.5;
+  font-weight: 600;
+  color: rgba(27, 71, 25, 0.92);
+  letter-spacing: 0.01em;
   margin: 0 auto 1.5rem auto;
-  max-width: 70ch;                                   /* Limita el ancho a 70 caracteres */
 }
+
+#sec4 .highlight {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 1.25em;
+  font-weight: 900;
+  color: #985fb3;
+  letter-spacing: 0.02em;
+}
+
+#sec4 .highlight.alt {
+  color: #009fb1;
+}
+
+#sec4 .highlight.strong {
+  color: #c4ff5a;
+}
+
 
 .btn-next {
   position: absolute;                                /* Lo fija en la esquina inferior-derecha (gracias a bottom y right) */
@@ -70,24 +125,16 @@
   transform: translateY(-3px);                       /* Lo levanta al hacer hover */
 }
 
-/* En tactil */
-@media (pointer: coarse) {
-  #sec4 .circle-bg {
-    /* valores "visual fallback" para cuando JS no corre inmediatamente */
-    width: 92vw;
-    height: 86vh;
-  }
-}
-
 #sec4 .btn-sec4 {
   display: inline-block;
-  margin-top: 1.5rem;
-  padding: 0.7rem 1.4rem;
+  margin-top: clamp(0.8rem, 2vh, 1.6rem);
+  padding: clamp(0.55rem, 1.2vw, 0.9rem) clamp(1.2rem, 2.4vw, 1.8rem);
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: 600;
   border: 2px solid #fff;
   border-radius: 999px;
   color: #fff;
   text-decoration: none;
-  font-weight: 600;
   z-index: 3;                                        /* encima del círculo */
   position: relative;
   transition: background 0.3s, transform 0.2s;
@@ -101,81 +148,33 @@
   transform: translateY(-2px);
 }
 
-@media (max-width: 1024px){
-  #sec4 .nosotros__contenido h1 {
-    font-size: clamp(2.7rem, 4.7vw, 4.3rem);
-    margin-bottom: 25px;
+
+/* En tactil -------------------------------------------------------------------------------------------------- */
+@media (hover: none) and (pointer: coarse) {
+  #sec4 .circle-bg {
+    /* valores "visual fallback" para cuando JS no corre inmediatamente */
+    width: 92vw;
+    height: 86vh;
   }
 
-  #sec4 .nosotros__contenido p {
-    font-size: clamp(1rem, 3vw, 2.5rem);
-    line-height: 1.5;
-    text-align: justify;
+  #sec4 .title-aurora {
+    animation: none;
+    background: none;
+    -webkit-text-fill-color: #fff;
+    color: #fff;
+    letter-spacing: 0.02em;
   }
-  #sec4 .btn-sec4 {
-    padding: 0.5rem 1rem;
-    font-size: clamp(1rem, 3vw, 2.5rem);
-    }
-}
 
-@media (max-width: 740px) {
   #sec4 .nosotros__contenido {
-    max-width: 85%;
-    max-height: 75%;
-    padding: 1rem;
+    justify-content: flex-start;
+    padding-top: 1.2rem;
+    padding-bottom: 1.2rem;
+    text-align: left;
   }
-  #sec4 .nosotros__contenido h1 {
-    font-size: clamp(2rem, 4vw, 3.6rem);
-    margin-bottom: 25px;
-  }
-}
-
-@media (max-width: 400px) {
-  #sec4 .nosotros__contenido {
-    max-height: 70%;
-  }
-
-  #sec4 .nosotros__contenido h1 {
-    font-size: clamp(1.5rem, 3.5vw, 3rem);
-  }
-
+  
   #sec4 .nosotros__contenido p {
-    font-size: clamp(0.9rem, 2.9vw, 2.4rem);
+    font-size: clamp(0.95rem, 3.8vw, 1.1rem);
+    line-height: 1.35;
+    margin-bottom: 1rem;
   }
-  #sec4 .btn-sec4 {
-    padding: 0.5rem 1rem;
-    font-size: clamp(0.9rem, 2.9vw, 2.4rem);
-    }
-}
-
-@media (max-width: 375px) {
-  #sec4 .nosotros__contenido {
-    max-height: 70%;
-  }
-
-  #sec4 .nosotros__contenido h1 {
-    font-size: clamp(1.2rem, 3.2vw, 2.7rem);
-  }
-
-  #sec4 .nosotros__contenido p {
-    font-size: clamp(0.8rem, 2.8vw, 2.3rem);
-  }
-  #sec4 .btn-sec4 {
-    padding: 0.5rem 1rem;
-    font-size: clamp(0.8rem, 2.8vw, 2.3rem);
-    }
-}
-
-@media (max-width: 344px) {
-  #sec4 .nosotros__contenido h1 {
-    font-size: clamp(1.6rem, 3.6vw, 3.1rem);
-  }
-
-  #sec4 .nosotros__contenido p {
-    font-size: clamp(0.9rem, 2.9vw, 2.4rem);
-  }
-  #sec4 .btn-sec4 {
-    padding: 0.5rem 1rem;
-    font-size: clamp(0.9rem, 2.9vw, 2.4rem);
-    }
 }
