@@ -1,0 +1,228 @@
+/* ======================== SECCION INICIO (SEC1) ======================== */
+
+#fondosec1 { /* CIELO */
+  position: absolute;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  object-fit: cover;                                        /* cubre toda la pantalla sin deformarse */
+  z-index: -3;                                              /* Queda detrás del contenido */
+}
+
+#edificio1 {
+  position: absolute;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.nubes {
+  position: absolute;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  z-index: -2;
+}
+
+#nube1,
+#nube2 {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: repeat-x;
+  background-size: 1100px auto;
+  animation-name: moverNube;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-play-state: paused;                             /* Por defecto: pausadas */
+}
+
+#nube1 {
+  background-image: url("../images/nube1.png");
+  animation-duration: 40s;
+}
+
+#nube2 {
+  background-image: url("../images/nube2.png");
+  top: 120px;
+  opacity: 0.6;
+  animation-duration: 25s;
+}
+
+/* Cuando la sección está en pantalla */
+.sec1-activa #nube1,
+.sec1-activa #nube2 {
+  animation-play-state: running;
+}
+
+@keyframes moverNube {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -1100px 0;
+  }
+}
+
+#logo1 {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 120px;
+  height: auto;
+}
+
+.content { z-index: 2;}                               /* por encima del video */
+.content h1 { 
+  font-size: 4.5rem;
+  font-family: 'Instrument Sans', sans-serif;
+}
+
+.content .naranja {
+  color: #ED8428; /* fallback por si JS no carga */
+}
+
+#sec1 h1.is-preparing {                               /* Oculta el texto mientras es separado letra por letra */
+  visibility: hidden;
+}
+
+#sec1 h1 .h1-char {
+  background: linear-gradient(180deg, #ffc477, #ED8428, #da6c0d); /* Color degradado para cada letra */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (pointer: coarse) {
+  #sec1 h1 {
+    background: linear-gradient(180deg, #ffc477, #ED8428, #da6c0d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+#sec1 h1 {
+  filter: drop-shadow(0 10px 14px rgba(0,0,0,0.55));
+}
+
+
+#sec1 .arrow-down {
+  position: absolute;
+  bottom: clamp(1.5rem, 6vh, 3rem);
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: clamp(36px, 6vw, 56px);
+  height: clamp(28px, 4vw, 34px);
+
+  /* Degradado */
+  background: linear-gradient(
+    to bottom,
+    #FFAB62 0%,
+    #E36A00 60%
+  );
+
+  /* Forma tipo flecha "cerrada arriba" */
+  clip-path: polygon(
+    0% 0%,      /* A */
+    50% 25%,    /* quiebre */
+    100% 0%,    /* C */
+    50% 100%,   /* D */
+    50% 100%
+  );
+  
+  cursor: pointer;
+  animation: bounce 2s infinite ease-in-out;
+  z-index: 3;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(10px); }
+}
+
+.sec3__sombra {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 40vh;
+
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.35) 50%,
+    rgba(0, 0, 0, 0.15) 55%,
+    rgba(0, 0, 0, 0) 100%
+  );
+
+  pointer-events: none;
+  z-index: 2;
+}
+
+.content a {
+  font-size: 1rem;
+  color: #fff;
+  text-decoration: none;
+  border: 2px solid #fff;
+  padding: 0.7rem 1.2rem;
+  border-radius: 999px;
+  z-index: 5;
+}
+
+#sec1 p{
+  font-size: 1.8rem;
+}
+
+@media (max-width: 1024px) {
+  #sec1 .content h1.naranja {
+    font-size: 90px;
+  }
+
+  #sec1 .content a {
+    font-size: clamp(0.7rem, 2.7vw, 2.2rem);
+  }
+}
+
+@media (max-width: 912px) {
+  #sec1 .content h1.naranja {
+    font-size: 100px;
+  }
+  #sec1 .content a {
+    font-size: clamp(1rem, 3vw, 2.5rem);
+  }
+  #sec1 p {
+    padding-inline: 1.2rem;   /* margen izquierdo y derecho */
+    font-size: clamp(16px, 15vw, 22px);
+  }
+}
+
+@media (max-width: 540px) {
+  #sec1 .content h1.naranja {
+    font-size: 65px;
+  }
+  #sec1 .content a {
+    font-size: clamp(0.7rem, 2.7vw, 2.2rem);
+  }
+}
+
+@media (max-width: 430px) {
+  #sec1 .content a {
+    font-size: clamp(1rem, 3vw, 2.5rem);
+  }
+}
+
+@media (max-width: 375px) {
+  #sec1 .content h1.naranja {
+    font-size: 55px;
+  }
+  #sec1 .content a {
+    font-size: clamp(0.9rem, 2.9vw, 2.4rem);
+  }
+}
