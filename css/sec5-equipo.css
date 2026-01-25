@@ -11,7 +11,9 @@
 }
 
 #sec5 h1 {                                           /* Título con otra tipografía */
-  font-family: "Nunito", sans-serif;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: clamp(3rem, 7vw, 4.4rem); 
+  margin-bottom: .3rem;
 }
 
 
@@ -19,8 +21,8 @@
 #sec5 .card__container {
   display: grid;                                     /* Para crear filas y columnas con las cartas */
   grid-template-columns: repeat(4, 1fr);             /* 4 columnas en PC */
-  gap: 1.5rem;                                       /* Separación entre tarjetas */
-  max-width: 1200px;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  max-width: min(1200px, 92vw);
   margin: 0 auto;                                    /* Centrado horizontal */
 }
 
@@ -51,7 +53,7 @@
 .tilt-wrapper .reflejo-brillante {
   position: absolute;
   top: 50%; left: 50%;
-  width: 180%; height: 180%;                         /* Mucho más grande para cubrir toda la carta */
+  width: 140%; height: 140%;                         /* Mucho más grande para cubrir toda la carta */
   z-index: 50;
   pointer-events: none;                              /* No bloquea clicks */
   transform: translate(-50%, -50%) rotate(45deg) scale(1);
@@ -63,7 +65,7 @@
   );
   opacity: 0;                                        /* Invisible hasta activar */
   mix-blend-mode: screen;                            /* Hace que el glare se mezcle con la tarjeta produciendo un efecto de luz realista, como si el brillo estuviera afectando al material de la tarjeta */
-  filter: blur(22px);                                /* Suaviza brillo */
+  filter: blur(14px);                                /* Suaviza brillo */
   transition: opacity 260ms ease, transform 260ms ease;
 }
 
@@ -105,12 +107,12 @@
   text-align: left;
 }
 #sec5 .card__name { 
-  font-size: 1.5rem; 
+  font-size: clamp(1.1rem, 1.8vw + 0.5rem, 2.1rem);
   margin-bottom: .25rem; 
 }
 
 #sec5 .card__profession { 
-  font-size: .813rem; 
+  font-size: clamp(0.75rem, 1.2vw + 0.3rem, 1.1rem); 
 }
 
 /* ----- ICONO CLIP ----- */
@@ -144,11 +146,11 @@
 #sec5 .info {
   position: absolute;
   inset: 0;                                          /* Panel cubre toda la tarjeta */
-  padding: 2rem 1rem;
+  padding: clamp(1rem, 2.5vw, 2rem);
   color: #fff;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
 
 
   background: hsla(0, 0%, 0%, .1);                 /* Negro transparente */
@@ -164,20 +166,24 @@
   will-change: backdrop-filter, clip-path;           /* Fuerza a Safari a recomponer bien */
 }
 
+#sec5 .info__data {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 #sec5 .info__name { 
-  font-size: 2rem; 
+  font-size: clamp(1.1rem, 3vw, 2.2rem); 
   margin-bottom: .5rem; 
 }
 
 #sec5 .info__description { 
-  font-size: .813rem; 
+  font-size: clamp(0.8rem, 2vw, 1rem); 
   margin-bottom: 1rem; 
 }
 
 /* Permite que el texto no colapse al reducir tamaño */
 #sec5 .info__name,
 #sec5 .info__description {
-  flex-shrink: 0;
   word-wrap: break-word;
 }
 
@@ -202,22 +208,21 @@
 
 #sec5 .info__social {
   margin-top: auto;
-  position: absolute;
-  left: 1rem; bottom: 1rem;
+  position: static;
   display: flex; gap: .5rem;
   justify-content: center;
 }
 #sec5 .info__link {
   background-color: rgba(200, 224, 135, 0.7);
-  width: 2rem;
-  height: 2rem;
+  width: clamp(24px, 6vw, 40px);
+  height: clamp(24px, 6vw, 40px);
+  font-size: clamp(1rem, 3.5vw, 1.8rem);
   border-radius: .75rem;
 
   display: flex;
   align-items: center;      /* centrado vertical */
   justify-content: center;  /* centrado horizontal */
 
-  font-size: 1.2rem;
   color: #000;
   transition: transform .4s;
 }
@@ -264,8 +269,6 @@
 @media (max-width: 1024px) {
   #sec5 .card__container {
     grid-template-columns: 1fr 1fr;                  /* 2 columnas */
-    gap: 1rem;
-    padding: 1.5rem;
   }
 
   #sec5 .card__clip {
@@ -274,74 +277,41 @@
     font-size: clamp(1.8rem, 3.8vw, 3.5rem);
   }
 
-  #sec5 .card__name { font-size: clamp(1.6rem, 3vw, 2.2rem); }
-  #sec5 .card__profession { font-size: clamp(0.8rem, 2.2vw, 1rem); }
-
-  #sec5 .info__name { font-size: clamp(2rem, 4vw, 3rem); }
-  #sec5 .info__description { font-size: clamp(0.9rem, 2.5vw, 1.2rem); }
-
   #sec5 .info__social {
-    position: absolute;
-    left: 50%;
-    bottom: 1rem;
-    transform: translateX(-50%);                     /* Centra iconos */
     display: flex;
     justify-content: center;
     gap: 1rem;
   }
 
-  #sec5 .info__link {
-    width: clamp(40px, 6vw, 60px);
-    height: clamp(40px, 6vw, 60px);
-    font-size: clamp(1.2rem, 3.5vw, 2rem);
-    border-radius: 0.6rem;
-  }
 }
 
-@media (max-width: 768px) {
+@media (min-width: 640px) and (max-width: 1024px) and (min-height: 850px) {
   #sec5 .card__container {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-  }
-
-  #sec5 .info__name { font-size: clamp(1.8rem, 4vw, 2.5rem); }
-  #sec5 .info__description { font-size: clamp(0.9rem, 3vw, 1.1rem); }
-
-  #sec5 .card__clip {
-    width: clamp(40px, 8vw, 70px);
-    height: clamp(40px, 8vw, 70px);
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
-  }
-
-  #sec5 .info__link {
-    width: clamp(35px, 7vw, 55px);
-    height: clamp(35px, 7vw, 55px);
+    max-width: min(860px, 75vw);
   }
 }
 
-@media (max-width: 480px) {
-  #sec5 .card__container {
-    grid-template-columns: 1fr 1fr;
-    padding: 1rem;
-  }
-
-  #sec5 .card__name { font-size: clamp(1.3rem, 3.5vw, 1.8rem); }
-  #sec5 .card__profession { font-size: clamp(0.7rem, 2.5vw, 1rem); }
-
-  #sec5 .info__name { display: none; }               /* Oculta nombres para no saturar */
-  #sec5 .info__description { font-size: clamp(0.8rem, 3vw, 1rem); }
-
-  #sec5 .card__clip {
-    width: clamp(35px, 9vw, 60px);
-    height: clamp(35px, 9vw, 60px);
-  }
-
+@media (min-width: 1025px) and (max-width: 1200px) {
+  #sec5 .info__name { 
+  font-size: clamp(1rem, 2.5vw, 2.2rem); 
+}
   #sec5 .info__link {
-    width: clamp(30px, 7vw, 50px);
-    height: clamp(30px, 7vw, 50px);
-    font-size: clamp(1rem, 3.2vw, 1.8rem);
+    width: clamp(17px, 4vw, 40px);
+    height: clamp(1px, 0.8vw, 35px);
+    font-size: clamp(0.5rem, 2.3vw, 1.2rem);
   }
 }
+
+@media (min-width: 400px) and (max-width: 1024px) {
+  #sec5 .info__name { 
+  font-size: clamp(1.1rem, 5vw, 2.3rem); 
+}
+
+#sec5 .info__description { 
+  font-size: clamp(0.8rem, 2.4vw, 1.3rem);
+}
+}
+
 
 @media (max-width: 360px) {
   #sec5 h1 { display: none; }                        /* Oculta título para espacio */
@@ -362,14 +332,6 @@
     font-size: clamp(1.2rem, 3.4vw, 2rem);
   }
 
-  #sec5 .info__name { font-size: clamp(1rem, 3vw, 1.6rem); }
-  #sec5 .info__description { font-size: clamp(0.8rem, 2.8vw, 1rem); }
-
-  #sec5 .info__link {
-    width: clamp(25px, 6vw, 45px);
-    height: clamp(25px, 6vw, 45px);
-    font-size: clamp(0.9rem, 2.8vw, 1.4rem);
-  }
 }
 
 /* ----------- PANTALLAS ALTAS Y ESTRECHAS (Galaxy Z Fold / S8) ----------- */
@@ -386,10 +348,14 @@
   }
 
   #sec5 .info__name { display: none; }
-  #sec5 .info__description { font-size: clamp(0.75rem, 2.3vw, 0.9rem); }
+
+  #sec5 .info__description { 
+  font-size: clamp(0.7rem, 3.5vw, 1rem); 
+}
+  
   #sec5 .info__link {
     width: clamp(25px, 5.5vw, 40px);
     height: clamp(25px, 5.5vw, 40px);
-    font-size: clamp(0.9rem, 2.8vw, 1.2rem);
+    font-size: clamp(1.1rem, 3.3vw, 1.5rem);
   }
 }
