@@ -1,5 +1,5 @@
 import { loaderHTML } from "./template/loader-template.js";
-import { modelPromise } from "./secciones/sec2-modelo3d.js";
+import { modelPromise } from "./secciones/sec3-modelo3d.js";
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -16,13 +16,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Fallback si GSAP no cargó
   if (!window.gsap) {
-    console.warn("[loader] GSAP no cargó, desactivando preloader");
     document.querySelector(".loading-screen")?.remove();
     document.body.classList.remove("preloader");
     document.body.removeAttribute("aria-busy");
     return;
   }
 
+  iniciarAnimacionFrase();
   iniciarLoader();
 });
 
@@ -86,13 +86,6 @@ function iniciarLoader() {
 
   // Recursos a esperar (imágenes, videos, escena 3D y fonts)
   const resources = [];
-
-
-  // === Precargar SOLO el video principal de la sección 1 ===
-  function preloadVideo(url) {
-    return fetch(url).then(r => r.blob()).catch(() => {});
-  }
-  resources.push(preloadVideo("/images/UniCartagena.mp4"));
 
   // Imágenes y videos
   document.querySelectorAll('img, video').forEach(el => {
@@ -199,19 +192,120 @@ function iniciarLoader() {
   requestAnimationFrame(bucleCarga);
 }
 
-function finalizarLoader() {
+let fraseTimeline = null;                                                 // timeline del ciclo de frases. Se deja fuera para detenerla cuando el loader termine (finalizarLoader())
 
-  if (!window.gsap) {
-    document.querySelector(".loading-screen")?.remove();
-    document.body.classList.remove("preloader");
-    document.body.removeAttribute("aria-busy");
-    return;
+function iniciarAnimacionFrase() {                                        // Controla la animación del texto: intro (typewriter) + ciclo GSAP
+
+  const fraseLoader = document.querySelector(".fraseLoader");             // Contenedor principal que se anima (sube, baja, aparece y desaparece)
+  if (!fraseLoader || !window.gsap) return;                               // Si no existe el elemento o GSAP no está cargado, se cancela todo
+
+  const fraseInner = fraseLoader.querySelector(".fraseInner");            // Texto que cambia de contenido y alineación
+
+  // ---------- TEXTOS ----------
+  const introTexto =                                                      // Texto que solo se muestra una vez. No forma parte del ciclo
+    "Una propuesta exclusiva de Gigazer para la Universidad de Cartagena.";
+
+  const textosCiclo = [                                                   // Este ciclo empieza despues de que el intro desaparece
+    "Estamos preparando tu experiencia.",
+    "Una propuesta exclusiva de Gigazer para la Universidad de Cartagena."
+  ];
+
+  // ---------- fijar ancho del contenedor solo para el intro ----------
+  
+  function ajustarAnchoIntro() {
+    const medidor = document.createElement("span");                       // Crea un medidor invisible
+    medidor.style.position = "absolute";                                  // No afecta el flujo del documento
+    medidor.style.visibility = "hidden";                                  // Invisible para el usuario
+    medidor.style.whiteSpace = "nowrap";                                  // Evita saltos de línea
+    medidor.style.font = getComputedStyle(fraseInner).font;               // Usa la misma fuente real, para que sea preciso
+
+    medidor.textContent = introTexto;                                     // Coloca el texto completo del intro
+    document.body.appendChild(medidor);                                   // Se añade temporalmente al DOM solo para medir
+
+    fraseInner.style.width = medidor.offsetWidth + "px";                  // Fija el ancho del contenedor interno
+    fraseInner.style.textAlign = "left";                                  // Alinea a la izquierda para el efecto typewriter
+
+    document.body.removeChild(medidor);                                   // Limpia
   }
+
+  ajustarAnchoIntro();                                                    // calcula el ancho correcto
+  window.addEventListener("resize", ajustarAnchoIntro);                   // se recalcula si cambia el tamaño
+
+
+  // ---------- INTRO: efecto escritura ----------
+  fraseInner.textContent = "";                                            // Empieza sin texto
+
+  let i = 0;                                                              // Índice que controla qué letra del texto se escribe
+
+  const escribir = () => {
+    fraseInner.textContent += introTexto[i];                              // Añade una letra más al texto visible
+    i++;                                                                  // Avanza al siguiente carácter
+
+    if (i < introTexto.length) {
+      setTimeout(escribir, 35);                                           // velocidad de escritura en ms
+    } else {                                                              // Cuando ya se escribió todo el texto...
+      setTimeout(salirIntro, 2000);                                       // Deja el texto visible durante 2 segundos antes de animar la salida
+    }
+  };
+
+  escribir();                                                             // Inicia el efecto typewriter
+
+  function salirIntro() {
+    gsap.to(fraseLoader, {
+      y: -80,                                                             // Mueve el contenedor hacia arriba
+      opacity: 0,                                                         // Lo desvanece al mismo tiempo
+      duration: 0.5,
+      ease: "power2.inOut",
+      onComplete: iniciarCiclo                                            // Solo cuando esta animación termina, se inicia el ciclo infinito de frases
+    });
+  }                  
+
+  // ---------- LOOP NORMAL ----------
+  function iniciarCiclo() {
+
+    window.removeEventListener("resize", ajustarAnchoIntro);
+    fraseInner.style.width = "";                                          // Quita el ancho fijo (ya no es necesario)
+    fraseInner.style.textAlign = "center";                                // Vuelve a estar centrado
+
+    let index = 0;                                                        // Índice que indica qué texto del array se está mostrando
+
+    fraseTimeline = gsap.timeline({ repeat: -1 });                        // Crea una timeline infinita (-1)
+
+    function cambiarTexto() {
+      fraseInner.textContent = textosCiclo[index];                        // Cambia el texto
+      index = (index + 1) % textosCiclo.length;                           // Avanza al siguiente texto de forma circular
+    }
+
+    cambiarTexto();                                                       // Establece el primer texto antes de animar
+
+    fraseTimeline
+      .add(() => {
+        gsap.set(fraseLoader, { y: 80, opacity: 0 });                     // Siempre empieza desde abajo
+      })
+      .to(fraseLoader, {                                                  // Entrada desde abajo con fade-in
+        y: 0,
+        opacity: 1,
+        duration: 0.5,
+        ease: "power2.out"
+      })
+      .to({}, { duration: 6 })                                            // Tiempo que el texto permanece visible sin moverse
+      .to(fraseLoader, {                                                  // Salida hacia arriba con fade-out
+        y: -80,
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.inOut"
+      })
+      .add(cambiarTexto)                                                  // Cambia el texto justo DESPUÉS de que sale
+  }
+}
+
+function finalizarLoader() {
 
   const tl = gsap.timeline({
     onComplete: () => {
+      fraseTimeline?.kill();
+      fraseTimeline = null;
       document.querySelector(".loading-screen")?.remove();
-      document.body.classList.remove("preloader");
       document.body.removeAttribute("aria-busy");
 
       // Marcar como mostrado después de terminar todo
@@ -244,8 +338,9 @@ function finalizarLoader() {
   .to(".loading-screen", {
     opacity: 0,
     duration: 0.6,
-    ease: "power1.inOut"
+    ease: "power1.inOut",
+    onStart: () => {
+      document.body.classList.remove("preloader");
+    }
   });
 }
-
-
