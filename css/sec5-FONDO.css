@@ -32,7 +32,7 @@ body.sec5-active #sec5 .sec5-bg-animated * {         /* Solo cuando la sección 
 }
 
 .sec5-bg-animated .gradients-container {             /* Contenedor que agrupa todas las burbujas */
-  filter: url(#gooSec5) blur(40px);                  /* Aplica el filtro SVG + desenfoque */
+  filter: url(#gooSec5) blur(22px);                  /* Aplica el filtro SVG + desenfoque */
   width: 100%;
   height: 100%;
   position: relative;
@@ -80,15 +80,29 @@ body.sec5-active #sec5 .sec5-bg-animated * {         /* Solo cuando la sección 
 .sec5-bg-animated .g3,
 .sec5-bg-animated .g4,
 .sec5-bg-animated .g5 {
-  position: absolute;                                /* Permite superposición libre */
+  position: absolute;
   width: var(--s5-circle-size);
   height: var(--s5-circle-size);
-  mix-blend-mode: var(--s5-blending);                /* Se mezclan entre sí */
-  opacity: 0.9;                                      /* Transparencia base */
-  background: radial-gradient(circle, rgba(var(--s5-color1),0.8) 0%, rgba(var(--s5-color1),0) 50%);
+  opacity: 0.75;
+  background: radial-gradient(circle, rgba(var(--s5-color1),0.8), transparent 60%);
   top: 10%;
   left: 10%;
 }
+/* Estas burbujas se mezclaran con absolutamente cualquiera */
+.sec5-bg-animated .g1,
+.sec5-bg-animated .interactive {
+  mix-blend-mode: var(--s5-blending);
+  opacity: 0.85;
+}
+/* Estas burbujas no se mezclan entre si, pero se mezclan con las que si lo pueden hacer con cualquiera */
+/* Estas burbujas NO usan mix-blend-mode. Se mezclan visualmente solo por opacidad y blur, reduciendo el costo */
+.sec5-bg-animated .g2,
+.sec5-bg-animated .g3,
+.sec5-bg-animated .g4,
+.sec5-bg-animated .g5 {
+  opacity: 0.65;
+}
+
 
 /* Colores y animaciones individuales */
 .sec5-bg-animated .g1 {
@@ -126,7 +140,6 @@ body.sec5-active #sec5 .sec5-bg-animated * {         /* Solo cuando la sección 
   top: -30%;
   left: -30%;
   background: radial-gradient(circle, rgba(var(--s5-interactive),0.8), transparent 60%);
-  mix-blend-mode: var(--s5-blending);
   opacity: 0.6;
   transition: transform 0.2s linear;                 /* Suavidad del seguimiento */
   pointer-events: none;                              /* No interfiere con clics */
@@ -141,68 +154,33 @@ body.sec5-active #sec5 .sec5-bg-animated * {         /* Solo cuando la sección 
 /* ========== SEC5 — FONDO LITE (cuando no hay GPU) ========== */
 
 #sec5-lite-bg {
-  display: none;                                     /* Solo se activa con .sec5-lite */
+  display: none;
   position: absolute;
   inset: 0;
   z-index: 0;
   overflow: hidden;
-  background: linear-gradient(135deg, #8f9e6b, #4f8339);
+
+  /* Degradado base */
+  background: linear-gradient(
+    135deg,
+    #ff7a18,
+    #f89b29,
+    #6aa84f
+  );
 }
 
-/* ---- burbujas ---- */
-#sec5-lite-bg .blob {
+/* Grid sutil encima */
+#sec5-lite-bg::before {
+  content: "";
   position: absolute;
-  width: 900px;
-  height: 900px;
-  border-radius: 50%;
+  inset: 0;
+
+  background-image:
+    linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+
+  background-size: 64px 64px;
   pointer-events: none;
-  opacity: 0.6;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-fill-mode: both;
-  will-change: transform;                            /* Optimización */
-}
-
-/* Blob azul */
-#sec5-lite-bg .blob.b1 {
-  background: radial-gradient(circle, rgba(0, 255, 170, 0.87), transparent 70%);
-  top: -15%;
-  left: -10%;
-}
-
-/* Blob amarilla */
-#sec5-lite-bg .blob.b2 {
-  background: radial-gradient(circle, rgba(252, 255, 55, 0.87), transparent 70%);
-  top: 45%;
-  left: 55%;
-}
-
-/* ---- Animaciones LITE ---- */
-
-#sec5-lite-bg .blob.b1 {
-  animation-name: blobFloat1;
-  animation-duration: 12s;
-}
-
-#sec5-lite-bg .blob.b2 {
-  animation-name: blobFloat2;
-  animation-duration: 16s;
-}
-
-@keyframes blobFloat1 {
-  0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
-  25%  { transform: translate(120px, 80px) scale(1.2) rotate(10deg); }
-  50%  { transform: translate(200px, -40px) scale(1.05) rotate(-8deg); }
-  75%  { transform: translate(90px, -20px) scale(1.15) rotate(4deg); }
-  100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-}
-
-@keyframes blobFloat2 {
-  0%   { transform: translate(0, 0) scale(1.1) rotate(0deg); }
-  25%  { transform: translate(-140px, -110px) scale(1) rotate(-12deg); }
-  50%  { transform: translate(-200px, 40px) scale(1.15) rotate(6deg); }
-  75%  { transform: translate(-100px, -20px) scale(1.05) rotate(-4deg); }
-  100% { transform: translate(0, 0) scale(1.1) rotate(0deg); }
 }
 
 
@@ -216,7 +194,7 @@ body.sec5-lite #sec5-full-bg {
 }
 
 /* ========== SEC5 — FONDO PLANO PARA MOVILES ========== */
-@media (max-width: 700px) {                          /* En celulares: desactivar completamente FULL y LITE, solo muestra el fondo de style.css */
+@media (hover: none) and (pointer: coarse) {         /* En celulares: desactivar completamente FULL y LITE, solo muestra el fondo de style.css */
   #sec5-full-bg,
   #sec5-lite-bg {
     display: none !important;
