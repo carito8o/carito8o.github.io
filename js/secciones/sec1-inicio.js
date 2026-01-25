@@ -3,7 +3,7 @@ import { gsap } from "gsap";
 const isMobile = window.matchMedia("(pointer: coarse)").matches;
 
 // ----------------------------------------------------------------
-// Animación de presentación (Explora más → GIGAZER)
+// Animación de presentación ( GIGAZER → Universidad de Cartagena)
 // ----------------------------------------------------------------
 
 function animarPresentacion() {
@@ -12,21 +12,34 @@ function animarPresentacion() {
 
   const tl = gsap.timeline();
 
-  tl.to({}, { duration: 4.5 })   // - - - - - - - - - espera 4.5 segundos mostrando "Explora más"
+  tl.to({}, { duration: 4.5 })   // - - - - - - - - - espera 4.5 segundos mostrando "GIGAZER"
 
-    .to(h1, {          // - - - - - - - - - - - - - - Oculta “Explora más”, lo sube y lo hace transparente.
+    .to(h1, {          // - - - - - - - - - - - - - - Oculta “GIGAZER”, lo sube y lo hace transparente.
       y: -80, 
       opacity: 0, 
       duration: 0.5, 
       ease: "power2.inOut" 
     })
 
-    .add(() => {           // - - - - - - - - - - - - Cambia el texto a “GIGAZER”
-      h1.textContent = "GIGAZER";
+    .add(() => {           // - - - - - - - - - - - - Cambia el texto a “Universidad de Cartagena”
+      const wrapper = h1.closest(".h1-wrapper");
+
+      h1.classList.add("is-preparing");   // oculta 1 frame, porque cuando se cambia el texto, primero aparecia el texto normal y luego el texto dividido letra por letra (que tenia un estilo diferente)
+
+      h1.textContent = "Universidad de Cartagena";
+
+      aplicarWaveLetters(h1);             // divide letras + aplica estilos
+
+      h1.classList.remove("is-preparing");// ya está listo
+
       gsap.set(h1, { y: 80, opacity: 0 });
+
+      if (wrapper) {
+        wrapper.classList.add("activo");
+      }
     })
 
-    .to(h1, {          // - - - - - - - - - - - - - - Muestra "GIGAZER" entrando desde abajo
+    .to(h1, {          // - - - - - - - - - - - - - - Muestra "Universidad de Cartagena" entrando desde abajo
       y: 0, 
       opacity: 1, 
       duration: 0.5, 
@@ -45,7 +58,8 @@ function animarPresentacion() {
 // ----------------------------------------------------------------
 
 function aplicarWaveLetters(titulo) {
-  if (!titulo || titulo.dataset.wave) return;
+  if (!titulo || titulo.dataset.wave || isMobile) return;
+
   titulo.dataset.wave = "true";
 
   // Generar nuevo contenido con letras separadas
@@ -72,21 +86,23 @@ function aplicarWaveLetters(titulo) {
   }
 
   const GrupoLetrasSeparadas = titulo.querySelectorAll(".h1-char");
+  let ultimoFrom = "center";                                          // recuerda desde dónde vino la ola
 
-  const animar = (subir, from = "center") => {
+  const animar = (subir) => {
     gsap.killTweensOf(GrupoLetrasSeparadas);
     gsap.to(GrupoLetrasSeparadas, {
       y: subir ? (i) => -18 - (i % 4) : 0,                            // Si "subir" es true, sube las letras. Si es false, las baja a 0
-      duration: subir ? 0.36 : 0.5,                                   // Duración de la animación (más corta al subir)
+      duration: subir ? 0.36 : 0.4,                                   // Duración de la animación (más corta al subir)
       ease: subir ? "power2.out" : "power2.inOut",
-      stagger: { each: 0.03, from }                                   // Hace que cada letra vaya con un pequeño retraso para crear la ola
+      stagger: { each: 0.03, from: ultimoFrom }                       // Hace que cada letra vaya con un pequeño retraso para crear la ola
     });
   };
 
   titulo.addEventListener("mouseenter", (e) => {
     const rect = titulo.getBoundingClientRect();                      // Obtiene el área ocupada por el título
     const fromLeft = e.clientX < rect.left + rect.width / 2;          // Verifica si el mouse entró por la izquierda o por la derecha
-    animar(true, fromLeft ? "start" : "end");                         // Activa la ola desde izquierda o derecha según corresponda
+    ultimoFrom = fromLeft ? "start" : "end";                          // se guarda el lado
+    animar(true);
   });
 
   // Eventos
@@ -115,7 +131,7 @@ function activarEfectoMirada() {
     gsap.to(h1, {
       rotationY: x,
       rotationX: -y,
-      transformPerspective: 600,                                      // Da efecto 3D real
+      transformPerspective: 900,                                      // Da efecto 3D real
       duration: 0.6,
       ease: "power2.out"
     });
@@ -137,6 +153,29 @@ function desactivarEfectoMirada() {
 }
 
 // ----------------------------------------------------------------
+// CONTROL DE NUBES (PAUSAR / REANUDAR)
+// ----------------------------------------------------------------
+
+function actualizarEstadoSec1(activa) {
+  const sec1 = document.getElementById("sec1");
+  if (!sec1) return;
+
+  sec1.classList.toggle("sec1-activa", activa);
+}
+
+// ----------------------------------------------------------------
+// Flecha para siguiente sec
+// ----------------------------------------------------------------
+
+document.querySelector(".arrow-down").addEventListener("click", () => {
+  document.querySelector("#sec2").scrollIntoView({
+    behavior: "smooth"
+  });
+});
+
+
+
+// ----------------------------------------------------------------
 // Inicialización general
 // ----------------------------------------------------------------
 
@@ -148,8 +187,11 @@ export function initSec1() {
     document.addEventListener("loader:end", animarPresentacion, { once: true });  // Esperar a que el preloader termine y entonces animar la presentación
   }
 
+  actualizarEstadoSec1(window.getCurrentSection?.() === 0);
+
   window.addEventListener("sectionChange", (e) => {                   // Activar/desactivar efecto de seguimiento de mouse según sección activa
     const index = e.detail.current;
+    actualizarEstadoSec1(index === 0);
     if (index === 0 && !isMobile) {                                   // Si estamos en la sección 0 (la primera) y NO es móvil
       activarEfectoMirada();
     } else {
@@ -157,4 +199,5 @@ export function initSec1() {
     }
   });
 }
+
 
