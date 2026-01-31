@@ -1,30 +1,29 @@
 import { gsap } from "gsap";
 gsap.registerPlugin(ScrollToPlugin);                                            // Activa ScrollToPlugin para controlar el scroll del viewport con GSAP (snap por sección)
 
+import { isTouchDevice } from "./utilidades/detectarDispositivo.js"; 
+import { initModelo3d } from "./modelo3d.js";
 import { initSec1 } from "./secciones/sec1-inicio.js";
 import { initSec2 } from "./secciones/sec2-servicios.js";
-import { initSec3 } from "./secciones/sec3-modelo3d.js";
-import { initSec4 } from "./secciones/sec4-nosotros.js";
-import { initSec5 } from "./secciones/sec5-equipo.js";
-import { initSec6 } from "./secciones/sec6-contacto.js";
+import { initSec3 } from "./secciones/sec3-nosotros.js";
+import { initSec4 } from "./secciones/sec4-equipo.js";
+import { initSec5 } from "./secciones/sec5-contacto.js";
 
 
 (() => {
 
   const sections = Array.from(document.querySelectorAll('.panel'));             // Busca todas las secciones de la página, las que tienen clase .panel, y las convierte en array para obtener su indice y usar "forEach"
-  const total = sections.length;                                                // Número total de secciones (6) para evitar ir a alguna seccion que no existe
-  const progressBar = document.querySelector('.scroll-progress-bar');
+  const totalSec = sections.length;                                             // Número total de secciones (5) para evitar ir a alguna seccion que no existe
+  const barraDeProgreso = document.querySelector('.scroll-progress-bar');
 
-  const PROGRESS_DURATION = 0.28;                                               // Duración de la animación de la barra de progreso cuando se cambia de seccion
+  const PROGRESS_BAR_DURATION = 0.28;                                               // Duración de la animación de la barra de progreso cuando se cambia de seccion
 
-  let current = 0;                                                              // Índice de la sección actual (de 0 a 5)
+  let current = 0;                                                              // Índice de la sección actual (de 0 a 4)
   let isAnimating = false;                                                      // Indica si hay una animación en curso. Evita múltiples transiciones simultáneas
   let draggingScrollbar = false;
+  let moverIndicadorNav = null;
 
-  const IS_TOUCH =                                                              // Detecta si el dispositivo es táctil o no
-    navigator.maxTouchPoints > 0 ||                                             // true si el navegador reporta puntos táctiles (los móviles reportan cuántos dedos soportan)
-    "ontouchstart" in window ||                                                 // fallback: si existe el evento ontouchstart en window, sugiere un dispositivo táctil
-    window.matchMedia("(pointer: coarse)").matches;                             // último recurso: media query que detecta un puntero "coarse" (dedo)
+  const IS_TOUCH = isTouchDevice();
 
   function loaderActivo() {
     return document.body.classList.contains("preloader");
@@ -49,13 +48,13 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   // --------------------------------------------------------------------------
   // Obtener sección por índice y calcular progreso
   // --------------------------------------------------------------------------
-  function getSectionByIndex(idx) {                                             // devuelve la sección (elemento .panel) asegurando índice válido
-    return sections[Math.max(0, Math.min(total - 1, idx))];                     // clamping: evita índices fuera de rango
+  function getSectionByIndex(idx) {                                             // devuelve la sección asegurando índice dentro de rango válido
+    return sections[Math.max(0, Math.min(totalSec - 1, idx))];                  // Math.min asegura que no sea mayor al total y Math.max asegura que no sea negativo
   }
 
-  function updateProgressForIndex(idx) {                                        // anima la barra de progreso hacia el porcentaje asociado a "idx"
-    const pct = (idx / (total - 1)) * 100;                                      // calcula porcentaje relativo (0..100) respecto al total de secciones
-    gsap.to(progressBar, { width: pct + "%", duration: PROGRESS_DURATION });    // anima con GSAP el ancho de la barra hasta el porcentaje calculado
+  function updateProgressBarForIndex(idx) {                                     // anima la barra de progreso hacia el porcentaje asociado a "idx"
+    const pct = (idx / (totalSec - 1)) * 100;                                   // calcula porcentaje relativo (0..100) respecto al total de secciones
+    gsap.to(barraDeProgreso, { width: pct + "%", duration: PROGRESS_BAR_DURATION }); // anima con GSAP el ancho de la barra hasta el porcentaje calculado
   }
 
   // --------------------------------------------------------------------------
@@ -64,30 +63,28 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
   // - En Moviles: usamos scroll nativo (scrollIntoView) para respetar zoom/pinch/gestos
   // --------------------------------------------------------------------------
 
-  // función principal que mueve la vista a la sección idx con animación GSAP y lógica según dispositivo
   function goTo(idx, source = "default") {                                      // source = "default" indica desde dónde se originó la navegación. Si el parámetro no se pasa, js asigna "default" (rueda, teclado, autosnap) automáticamente; la alternativa es nav, que tiene su propia animación
 
-    if (window.__transitionLocked) return;                                      // Evita cambiar de sección mientras se ejecutan transiciones críticas (ej. fondo full sec5), para no solapar animaciones de scroll con lógica pesada y prevenir tirones
-
+    if (window.__transitionLocked) return;                                      // Evita cambiar de sección mientras se ejecutan transiciones críticas (ej. fondo full sec4), para no solapar animaciones de scroll con lógica pesada y prevenir tirones
     if (window.__isCollapsing3D) return;                                        // Si el 3D ya está en proceso de colapso, no hace nada para evitar duplicar acciones
-    if (window.is3DExpanded?.()) {                                              // Si el 3D está expandido cuando se intenta navegar...
-      window.__isCollapsing3D = true;                                           // Marca que el colapso ya fue iniciado
-      window.on3DCollapsed = () => goTo(idx, source);                           // Guarda la navegación como callback diferido. NO navega todavía
+    if (window.is3DExpanded?.()) {                                              // Si el contenedor 3D está expandido cuando se intenta navegar...
+      window.__isCollapsing3D = true;                                           // Marca que el colapso ya fue iniciado. Evita que se intente colapsar dos veces
+      window.after3DCollapse = () => goTo(idx, source);                         // Guarda la navegación como callback diferido, "= () =>" se usa para guardar una función que llama a otra función. NO navega todavía, se ejecuta cuando alguien llame a window.after3DCollapse
       window.collapse3DContainer?.();                                           // Inicia el colapso del contenedor 3D
       return;
     }
   
-    const modal = document.getElementById("mail-modal");                        // ventanita de opciones de emails de la sec6
-    if (modal) modal.style.display = "none";                                    // si existe, lo oculta inmediatamente (cuando se sale de sec6, se cierra)
+    const modal = document.getElementById("mail-modal");                        // ventanita de opciones de emails de la sec5
+    if (modal) modal.style.display = "none";                                    // si existe, lo oculta inmediatamente (cuando se sale de sec5, se cierra)
 
-    const next = Math.max(0, Math.min(total - 1, idx));                         // asegura índice dentro de límites (clamp)
+    const next = Math.max(0, Math.min(totalSec - 1, idx));                      // asegura índice dentro de límites (clamp)
     if (next === current) return;                                               // si no hay cambio de sec, no hace nada
 
     const target = getSectionByIndex(next);                                     // obtener elemento destino por índice
     if (!target) return;
 
     // ------------------ MODO MÓVIL → scroll nativo ------------------
-    if (IS_TOUCH) {
+    if (IS_TOUCH) {                                                             // En móviles usamos scroll nativo (sin snap) para respetar gestos, zoom y navbar
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });            // Hacer scroll suave nativo (no snap); el observer actualizará "current" cuando la sección sea mayoritariamente visible. "start" alinea la parte superior
       return;
     }
@@ -105,19 +102,21 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
       duration,                                                                 // duración de la animación al cambiar de una sección a otra
       ease,
 
-      onUpdate: () => {                                                         // Mover barra de progreso MIENTRAS se anima
+      onStart: () => {  
+        moverIndicadorNav?.(next);
+      },
+
+      onUpdate: () => {                                                         // Mover barra de progreso MIENTRAS se anima. Esta parte es mas que todo acompañamiento visual
         const scrollY = window.scrollY;                                         // lee la posición actual del scroll del documento
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight; // calcula máximo scroll posible, para convertir a porcentaje
         const pct = maxScroll > 0 ? (scrollY / maxScroll) * 100 : 0;            // convierte scrollY en porcentaje (evita división por cero)
-        gsap.set(progressBar, { width: pct + "%" });                            // actualiza la anchura de la barra sin crear nueva animación (set es instantáneo)
+        gsap.set(barraDeProgreso, { width: pct + "%" });                        // actualiza la anchura de la barra sin crear nueva animación (set es instantáneo)
       },
 
       onComplete: () => {
         current = next;                                                         // sincroniza la sección actual con el destino
-        handleVideoVisibility();                                                // actualiza reproducción/pausa de videos según la nueva sección
-        if (window.collapse3DContainer) window.collapse3DContainer();           // Si el contenedor 3D estaba expandido, lo colapsamos
         if (window.reset3DCamera) window.reset3DCamera();                       // Reinicia la cámara Three.js cuando se cambia de sección
-        updateProgressForIndex(current);                                        // asegura que la barra quede exacta a la nueva sección (la actual)
+        updateProgressBarForIndex(current);                                     // asegura que la barra quede exacta a la nueva sección (la actual)
 
         // Evento global para todas las secciones
         window.dispatchEvent(new CustomEvent("sectionChange", { detail: { current } })); // indice actual. Notifica que se cambió de sección
@@ -129,55 +128,46 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
 
   window.goToSection = goTo;                                                    // Exponer para conTab.js
 
-  // --------------------------------------------------------------------------
-  // CONTROL DE VIDEOS
-  // --------------------------------------------------------------------------
-  function handleVideoVisibility() {
-
-    const serviceVideos = document.querySelectorAll("#sec3 .servicios__video"); // busca videos dentro de la sección 3
-    serviceVideos.forEach(v => {                                                // itera cada video de servicios
-      v.muted = true;
-      v.setAttribute("muted", "");
-      current === 1 ? v.play().catch(() => {}) : v.pause();                     // reproduce solo si estamos en sec2 (índice 1)
-    });
-  }
-
 
   // --------------------------------------------------------------------------
-  // OBSERVER — detecta que sección domina el viewport y actualiza estado (funciona en ambos modos)
+  // NAV INDICADOR — REACTIVO A current
   // --------------------------------------------------------------------------
 
-  const observer = new IntersectionObserver((entries) => {                      // IntersectionObserver para saber qué secciones están visibles y qué tanto. Cada entrada contiene el elemento observado (una sección) y porcentaje visible de ese elemento (0 a 1)
-    if (isAnimating) return;                                                    // si hay una animación en curso, ignoramos eventos del observer
+  function iniciarIndicadorNav() {
+    if (IS_TOUCH) return;
 
-    let masVisible = null;                                                      // variable para la entrada con mayor intersección (la más visible)
+    const nav = document.querySelector(".navbar");
+    const links = nav?.querySelectorAll(".nav-links a");
+    const indicadorNav = nav?.querySelector(".nav-indicador");
 
-    entries.forEach(entry => {
-      if (!masVisible || entry.intersectionRatio > masVisible.intersectionRatio) { // selecciona la sección más visible comparando intersectionRatio
-        masVisible = entry;                                                     // actualiza la variable con la entrada más visible encontrada
-      }
-    });
+    if (!nav || !links.length || !indicadorNav) return;
 
-    if (!masVisible) return;                                                    // si no encontró ninguna, sale
-
-    if (masVisible.intersectionRatio >= 0.55) {                                 // solo actúa si una sección ocupa al menos 55% del viewport
-      const idx = sections.indexOf(masVisible.target);                          // calcula índice de la sección más visible
-      if (idx !== -1 && idx !== current) {                                      // si el índice es válido y distinto al actual...
-        current = idx;                                                          // actualiza índice actual
-        handleVideoVisibility();
-        if (window.collapse3DContainer) window.collapse3DContainer();           // colapsa 3D si existe
-        updateProgressForIndex(current);                                        // actualiza barra de progreso
-
-        window.dispatchEvent(new CustomEvent("sectionChange", { detail: { current } })); // notifica cambio de sección
-      }
+    function seccionAIndiceNav(sectionIdx) {
+      if (sectionIdx === 3) return 2;
+      if (sectionIdx === 4) return 3;
+      return sectionIdx;
     }
-  }, {
-    root: null,                                                                 // root null: el root es el viewport (window)
-    rootMargin: "0px",                                                          // sin margen extra, comportamiento estándar
-    threshold: Array.from({ length: 101 }, (_, i) => i / 100)                   // array [0, 0.01, 0.02, ..., 1] para recibir callbacks con granularidad del 1%; esto permite medir con precisión cuánta parte de cada sección está visible
-  });
 
-  sections.forEach(s => observer.observe(s));                                   // comienza a observar cada sección .panel para cambios de visibilidad
+    moverIndicadorNav = function(sectionIdx) {
+      const navIdx = seccionAIndiceNav(sectionIdx);
+      const link = links[navIdx];
+      if (!link) return;
+      const linkRect = link.getBoundingClientRect();
+      const navRect = nav.getBoundingClientRect();
+      const posicionX =
+      linkRect.left - navRect.left + linkRect.width / 2 - indicadorNav.offsetWidth / 2;
+
+      gsap.to(indicadorNav, {
+        x: posicionX,
+        opacity: 1,
+        duration: 0.25,
+        ease: "power2.out",
+        overwrite: true
+      });
+    };
+    // posicionar correctamente al iniciar
+    requestAnimationFrame(() => moverIndicadorNav(current));
+  }
 
 
   // --------------------------------------------------------------------------
@@ -320,7 +310,7 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
       const scrollY = window.scrollY;                                           // posición actual del scroll desde arriba
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight; // cuánto máximo puede scrollear el documento
       const pct = maxScroll > 0 ? (scrollY / maxScroll) * 100 : 0;              // convierte el scroll a porcentaje entre 0 y 100
-      gsap.set(progressBar, { width: pct + "%" });                              // actualizar barra instantáneamente
+      gsap.set(barraDeProgreso, { width: pct + "%" });                              // actualizar barra instantáneamente
     }, { passive: true });
   }
 
@@ -345,7 +335,7 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
 
       } else if (e.key === "End") {
         e.preventDefault(); 
-        goTo(total - 1);
+        goTo(totalSec - 1);
       }
     }
 
@@ -374,8 +364,8 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
       });
     }
 
-    function wireNextButton() {                                                 // botón dentro de sec4 que salta a la siguiente sección (5)
-      const btn = document.querySelector('#sec4 .btn-next');
+    function wireNextButton() {                                                 // botón dentro de sec3 que salta a la siguiente sección (4)
+      const btn = document.querySelector('#sec3 .btn-next');
       if (!btn) return;
 
       btn.addEventListener('click', (ev) => {                                   // cuando se hace clic en el botón...
@@ -389,68 +379,6 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
     }
 
     // --------------------------------------------------------------------------
-    // NAV indicador — DESKTOP / TIEMPO REAL
-    // --------------------------------------------------------------------------
-
-    (function iniciarIndicadorNav() {                                           // Se ejecuta inmediatamente al cargarse el script
-
-      if (IS_TOUCH) return;                                                     // En celulares no hay indicador del nav, porque el nav es tipo hamburguesa
-
-      const nav = document.querySelector(".navbar");
-      const links = nav?.querySelectorAll(".nav-links a");                      // Busca los links del nav solo si .navbar existe (evita errores si es null)
-      const indicadorNav = nav?.querySelector(".nav-indicador");                // Selecciona el elemento visual que se mueve (la línea)
-      const secciones = document.querySelectorAll(".panel");
-
-      if (!nav || !links.length || !indicadorNav || !secciones.length) return;  // Si falta cualquier elemento crítico, se cancela todo
-
-      function seccionAIndiceNav(sectionIdx) {                                  // Traduce el índice de sección real al índice del navbar, porque no hay orden normal (sec4 y sec5 pertenecen a un solo indice)
-        if (sectionIdx === 4) return 3;                                         // sec5 (equipo) → link "NOSOTROS"
-        if (sectionIdx === 5) return 4;                                         // sec6 (contacto) → link "CONTACTO"
-        return sectionIdx;                                                      // Para el resto, el índice coincide directamente
-      }
-
-      function moverIndicadorA(link) {                                          // Mueve visualmente el indicador para alinearlo con un link específico
-        const linkRect = link.getBoundingClientRect();                          // Obtiene la posición y tamaño del link relativo al viewport
-        const navRect = nav.getBoundingClientRect();                            // Obtiene la posición del navbar en el viewport
-
-        const posicionX =                                                       // Coordenada X exacta donde el indicador debe colocarse
-          linkRect.left -                                                       // posición absoluta del link
-          navRect.left +                                                        // restamos la posición del navbar
-          linkRect.width / 2 -                                                  // centramos respecto al link
-          indicadorNav.offsetWidth / 2;                                         // centramos el indicador respecto a su propio ancho
-
-        gsap.to(indicadorNav, {
-          x: posicionX,
-          opacity: 1,
-          duration: 0.25,
-          ease: "power2.out",
-          overwrite: true                                                       // Cancela animaciones anteriores sobre el mismo target, para evitar acumulación y jitter al hacer scroll rápido
-        });
-      }
-
-      function actualizarIndicadorPorScroll() {                                 // Decide qué link debe estar activo según el scroll ACTUAL
-        const scrollMaximo =  document.documentElement.scrollHeight - window.innerHeight; // Calcula el máximo scroll posible del documento. Altura total - altura visible
-
-        if (scrollMaximo <= 0) return;                                          // Protección: evita división por cero en páginas cortas
-
-        const progresoScroll = window.scrollY / scrollMaximo;
-        const indiceVisual = progresoScroll * (secciones.length - 1);           // Convierte el progreso a un índice "virtual" entre secciones. Ejemplo: 2.3 significa "entre sección 2 y 3"
-
-        const indiceSeccionCercana = Math.round(indiceVisual);                  // Redondea para elegir la sección más cercana visualmente
-        const navIdx = seccionAIndiceNav(indiceSeccionCercana);                 // Traduce índice de sección a índice del navbar
-        const enlaceActivo = links[navIdx];                                     // Obtiene el link correspondiente en el navbar
-
-        if (enlaceActivo) moverIndicadorA(enlaceActivo);                        // Si existe, mueve el indicador hacia ese link
-      }
-
-      window.addEventListener("scroll", actualizarIndicadorPorScroll, { passive: true }); // Ejecuta la actualización del indicador en CADA scroll
-
-      requestAnimationFrame(actualizarIndicadorPorScroll);                      // Ejecuta una primera actualización cuando el navegador está listo para pintar. Posiciona correctamente el indicador al cargar la página
-
-    })();
-
-
-    // --------------------------------------------------------------------------
     // RESIZE / ORIENTACIÓN DEL DISPOSITIVO
     // --------------------------------------------------------------------------
     function onResize() {
@@ -461,6 +389,7 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
       if (target) {
         target.scrollIntoView({ behavior: 'auto', block: 'start' });            // Reacomoda la pantalla para que la sección actual quede alineada arriba
       }
+
     }
 
     window.addEventListener("orientationchange", () => {                        // se dispara al rotar la pantalla en móvil
@@ -484,19 +413,21 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
 
     document.documentElement.style.scrollBehavior = IS_TOUCH ? 'smooth' : 'auto'; // En móviles permite el scroll nativo y suave; en pc usa el scroll con GSAP
 
-    gsap.set(progressBar, { width: "0%" });                                     // resetea barra de progreso visualmente
+    gsap.set(barraDeProgreso, { width: "0%" });                                     // resetea barra de progreso visualmente
 
     window.addEventListener("keydown", onKeyDown);                              // escucha teclado globalmente
 
     wireNavLinks();
     wireNextButton();
+    if (!IS_TOUCH) iniciarIndicadorNav();
+
 
     initSec1();
     initSec2();
     initSec3();
     initSec4();
     initSec5();
-    initSec6();
+    initModelo3d();
 
     const h1 = sections[0].querySelector("h1");                                 // busca el h1 (el titulo en la mitad) de la primera sección
     if (h1) h1.setAttribute("tabindex", "-1");
@@ -512,7 +443,7 @@ import { initSec6 } from "./secciones/sec6-contacto.js";
           else gsap.set(window, { scrollTo: el });                              // PC → salto directo
         }
       }
-      updateProgressForIndex(current);                                          // actualizar barra de progreso al iniciar
+      updateProgressBarForIndex(current);                                          // actualizar barra de progreso al iniciar
     }, 50);                                                                     // 50 ms permite que el layout esté listo
   }
 
