@@ -1,5 +1,5 @@
 import { loaderHTML } from "./template/loader-template.js";
-import { modelPromise } from "./secciones/sec3-modelo3d.js";
+import { modelPromise } from "./modelo3d.js";
 
 document.addEventListener("DOMContentLoaded", () => {
 
