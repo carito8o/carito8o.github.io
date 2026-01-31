@@ -1,6 +1,7 @@
 import { gsap } from "gsap";
+import { isTouchDevice } from "../utilidades/detectarDispositivo.js";
 
-const isMobile = window.matchMedia("(pointer: coarse)").matches;
+const IS_TOUCH = isTouchDevice();
 
 // ----------------------------------------------------------------
 // Animación de presentación ( GIGAZER → Universidad de Cartagena)
@@ -45,7 +46,7 @@ function animarPresentacion() {
       duration: 0.5, 
       ease: "power2.inOut",
       onComplete: () => {
-        if (!isMobile) {         // - - - - - - - - - Si NO es celular, activa efecto de ondas en letras y efecto de que el texto sigue el mouse
+        if (!IS_TOUCH) {         // - - - - - - - - - Si NO es celular, activa efecto de ondas en letras y efecto de que el texto sigue el mouse
           if (!h1.dataset.wave) aplicarWaveLetters(h1);
           activarEfectoMirada();
         }
@@ -58,7 +59,7 @@ function animarPresentacion() {
 // ----------------------------------------------------------------
 
 function aplicarWaveLetters(titulo) {
-  if (!titulo || titulo.dataset.wave || isMobile) return;
+  if (!titulo || titulo.dataset.wave || IS_TOUCH) return;
 
   titulo.dataset.wave = "true";
 
@@ -119,7 +120,7 @@ function aplicarWaveLetters(titulo) {
 let onMove, onLeave;
 
 function activarEfectoMirada() {
-  if (isMobile) return;
+  if (IS_TOUCH) return;
 
   const sec1 = document.getElementById("sec1");
   const h1 = sec1?.querySelector("h1");
@@ -167,13 +168,11 @@ function actualizarEstadoSec1(activa) {
 // Flecha para siguiente sec
 // ----------------------------------------------------------------
 
-document.querySelector(".arrow-down").addEventListener("click", () => {
-  document.querySelector("#sec2").scrollIntoView({
-    behavior: "smooth"
-  });
+document.querySelector(".arrow-down")?.addEventListener("click", () => {
+  if (window.goToSection) {
+    window.goToSection(1);
+  }
 });
-
-
 
 // ----------------------------------------------------------------
 // Inicialización general
@@ -192,12 +191,11 @@ export function initSec1() {
   window.addEventListener("sectionChange", (e) => {                   // Activar/desactivar efecto de seguimiento de mouse según sección activa
     const index = e.detail.current;
     actualizarEstadoSec1(index === 0);
-    if (index === 0 && !isMobile) {                                   // Si estamos en la sección 0 (la primera) y NO es móvil
+    if (index === 0 && !IS_TOUCH) {                                   // Si estamos en la sección 0 (la primera) y NO es móvil
       activarEfectoMirada();
     } else {
       desactivarEfectoMirada();
     }
   });
 }
-
 
