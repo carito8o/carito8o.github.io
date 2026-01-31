@@ -1,4 +1,4 @@
-/* ======================================================== FONDO ANIMADO SEC5 ========================================================  */
+/* ======================================================== FONDO ANIMADO sec4 ========================================================  */
 /*
 - Fondo FULL (animado, pesado, GPU)
 - Fondo LITE (animado, pero machucho)
@@ -7,8 +7,8 @@
 
 /* ========== Fondo full ========== */
 
-.sec5-bg-animated {
-  position: absolute;                                /* Saca el fondo del flujo normal y lo posiciona respecto a #sec5 */
+.sec4-bg-animated {
+  position: absolute;                                /* Saca el fondo del flujo normal y lo posiciona respecto a #sec4 */
   inset: 0;                                          /* Ocupa todo el ancho y alto de la sección */
   z-index: 0;
   overflow: hidden;
@@ -17,21 +17,21 @@
   contain: layout paint;                             /* Aísla el layout y repintado SOLO dentro de este contenedor, para que no afecte a toda la pagina */
 }
 
-#sec5 .sec5-bg-animated * {                          /* Por defecto: animaciones pausadas (para que no funcionen fuera de sec5) */
+#sec4 .sec4-bg-animated * {                          /* Por defecto: animaciones pausadas (para que no funcionen fuera de sec4) */
   animation-play-state: paused;
 }
 
-body.sec5-active #sec5 .sec5-bg-animated * {         /* Solo cuando la sección está activa */
+body.sec4-active #sec4 .sec4-bg-animated * {         /* Solo cuando la sección está activa */
   animation-play-state: running;
 }
 
-.sec5-bg-animated svg {                              /* SVG usado SOLO para el filtro gooey */
+.sec4-bg-animated svg {                              /* SVG usado SOLO para el filtro gooey */
   position: absolute;
   width: 0;                                          /* El SVG no es visible, solo define filtros. Si se quita, el filtro gooey deja de existir */
   height: 0;
 }
 
-.sec5-bg-animated .gradients-container {             /* Contenedor que agrupa todas las burbujas */
+.sec4-bg-animated .gradients-container {             /* Contenedor que agrupa todas las burbujas */
   filter: url(#gooSec5) blur(22px);                  /* Aplica el filtro SVG + desenfoque */
   width: 100%;
   height: 100%;
@@ -75,11 +75,11 @@ body.sec5-active #sec5 .sec5-bg-animated * {         /* Solo cuando la sección 
 }
 
 /* Cada burbuja */
-.sec5-bg-animated .g1,
-.sec5-bg-animated .g2,
-.sec5-bg-animated .g3,
-.sec5-bg-animated .g4,
-.sec5-bg-animated .g5 {
+.sec4-bg-animated .g1,
+.sec4-bg-animated .g2,
+.sec4-bg-animated .g3,
+.sec4-bg-animated .g4,
+.sec4-bg-animated .g5 {
   position: absolute;
   width: var(--s5-circle-size);
   height: var(--s5-circle-size);
@@ -89,43 +89,43 @@ body.sec5-active #sec5 .sec5-bg-animated * {         /* Solo cuando la sección 
   left: 10%;
 }
 /* Estas burbujas se mezclaran con absolutamente cualquiera */
-.sec5-bg-animated .g1,
-.sec5-bg-animated .interactive {
+.sec4-bg-animated .g1,
+.sec4-bg-animated .interactive {
   mix-blend-mode: var(--s5-blending);
   opacity: 0.85;
 }
 /* Estas burbujas no se mezclan entre si, pero se mezclan con las que si lo pueden hacer con cualquiera */
 /* Estas burbujas NO usan mix-blend-mode. Se mezclan visualmente solo por opacidad y blur, reduciendo el costo */
-.sec5-bg-animated .g2,
-.sec5-bg-animated .g3,
-.sec5-bg-animated .g4,
-.sec5-bg-animated .g5 {
+.sec4-bg-animated .g2,
+.sec4-bg-animated .g3,
+.sec4-bg-animated .g4,
+.sec4-bg-animated .g5 {
   opacity: 0.65;
 }
 
 
 /* Colores y animaciones individuales */
-.sec5-bg-animated .g1 {
+.sec4-bg-animated .g1 {
   background: radial-gradient(circle, rgba(var(--s5-color1),0.8), transparent 60%);
   animation: s5-moveVertical 30s ease infinite;      /* Movimiento vertical lento */
 }
 
-.sec5-bg-animated .g2 {
+.sec4-bg-animated .g2 {
   background: radial-gradient(circle, rgba(var(--s5-color2),0.8), transparent 60%);
   animation: s5-moveInCircle 25s reverse infinite;   /* Movimiento circular invertido */
 }
 
-.sec5-bg-animated .g3 {
+.sec4-bg-animated .g3 {
   background: radial-gradient(circle, rgba(var(--s5-color3),0.8), transparent 60%);
   animation: s5-moveInCircle 40s linear infinite;
 }
 
-.sec5-bg-animated .g4 {
+.sec4-bg-animated .g4 {
   background: radial-gradient(circle, rgba(var(--s5-color4),0.8), transparent 60%);
   animation: s5-moveHorizontal 35s ease infinite;
 }
 
-.sec5-bg-animated .g5 {
+.sec4-bg-animated .g5 {
   background: radial-gradient(circle, rgba(var(--s5-color5),0.8), transparent 60%);
   width: calc(var(--s5-circle-size) * 2);            /* Burbuja más grande */
   height: calc(var(--s5-circle-size) * 2);
@@ -133,7 +133,7 @@ body.sec5-active #sec5 .sec5-bg-animated * {         /* Solo cuando la sección 
 }
 
 /* Burbuja interactiva (sigue al mouse) */
-.sec5-bg-animated .interactive {
+.sec4-bg-animated .interactive {
   position: absolute;
   width: 160%;
   height: 160%;
@@ -146,14 +146,14 @@ body.sec5-active #sec5 .sec5-bg-animated * {         /* Solo cuando la sección 
   will-change: transform;
 }
 
-#sec5 .content {                                     /* Asegurar que el contenido quede encima */
+#sec4 .content {                                     /* Asegurar que el contenido quede encima */
   position: relative;
   z-index: 10;
 }
 
-/* ========== SEC5 — FONDO LITE (cuando no hay GPU) ========== */
+/* ========== sec4 — FONDO LITE (cuando no hay GPU) ========== */
 
-#sec5-lite-bg {
+#sec4-lite-bg {
   display: none;
   position: absolute;
   inset: 0;
@@ -170,7 +170,7 @@ body.sec5-active #sec5 .sec5-bg-animated * {         /* Solo cuando la sección 
 }
 
 /* Grid sutil encima */
-#sec5-lite-bg::before {
+#sec4-lite-bg::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -185,18 +185,19 @@ body.sec5-active #sec5 .sec5-bg-animated * {         /* Solo cuando la sección 
 
 
 /* Activación del modo LITE ----------- */
-body.sec5-lite #sec5-lite-bg {
+body.sec4-lite #sec4-lite-bg {
   display: block !important;                         /* Se muestra el fondo LITE */
 }
 
-body.sec5-lite #sec5-full-bg {
+body.sec4-lite #sec4-full-bg {
   display: none !important;                          /* Se oculta el fondo FULL */
 }
 
-/* ========== SEC5 — FONDO PLANO PARA MOVILES ========== */
+/* ========== sec4 — FONDO PLANO PARA MOVILES ========== */
 @media (hover: none) and (pointer: coarse) {         /* En celulares: desactivar completamente FULL y LITE, solo muestra el fondo de style.css */
-  #sec5-full-bg,
-  #sec5-lite-bg {
+  #sec4-full-bg,
+  #sec4-lite-bg {
     display: none !important;
   }
 }
+
