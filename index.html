@@ -12,13 +12,13 @@
 
   <link rel="stylesheet" href="../css/loader.css">
   <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/modelo3d.css">
   <link rel="stylesheet" href="../css/sec1-inicio.css">
   <link rel="stylesheet" href="../css/sec2-servicios.css">
-  <link rel="stylesheet" href="../css/sec3-proyectos.css">
-  <link rel="stylesheet" href="../css/sec4-nosotros.css">
-  <link rel="stylesheet" href="../css/sec5-equipo.css">
-  <link rel="stylesheet" href="../css/sec5-FONDO.css">
-  <link rel="stylesheet" href="../css/sec6-contactar.css">
+  <link rel="stylesheet" href="../css/sec3-nosotros.css">
+  <link rel="stylesheet" href="../css/sec4-equipo.css">
+  <link rel="stylesheet" href="../css/sec4-FONDO.css">
+  <link rel="stylesheet" href="../css/sec5-contactar.css">
 
 
   <script type="importmap">
@@ -46,9 +46,8 @@
     <ul class="nav-links">
       <li><a href="#sec1" data-index="0">INICIO</a></li>
       <li><a href="#sec2" data-index="1">SERVICIOS</a></li>
-      <li><a href="#sec3" data-index="2">PROYECTOS</a></li>
-      <li><a href="#sec4" data-index="3">NOSOTROS</a></li>
-      <li><a href="#sec6" data-index="5">CONTACTO</a></li>
+      <li><a href="#sec3" data-index="2">NOSOTROS</a></li>
+      <li><a href="#sec5" data-index="4">CONTACTO</a></li>
     </ul>
     <div class="nav-indicador"></div>
 
@@ -63,9 +62,8 @@
       <ul>
         <li><a href="#sec1" data-index="0">INICIO</a></li>
         <li><a href="#sec2" data-index="1">SERVICIOS</a></li>
-        <li><a href="#sec3" data-index="2">PROYECTOS</a></li>
-        <li><a href="#sec4" data-index="3">NOSOTROS</a></li>
-        <li><a href="#sec6" data-index="5">CONTACTO</a></li>
+        <li><a href="#sec3" data-index="2">NOSOTROS</a></li>
+        <li><a href="#sec5" data-index="4">CONTACTO</a></li>
       </ul>
     </div>
 
@@ -106,16 +104,12 @@
           <!-- Columna 1 -->
           <div class="servicios__col">
             <div class="servicio-expandido servicio-expandido--3d">
-
-    <div class="servicio-3d-wrapper">
-      <h1>Mapa 3D</h1>
-
-      <div class="model-container" id="model-container"></div>
-
-      <a href="#" class="btn-sec2">Ver proyecto completo</a>
-    </div>
-
-  </div>
+              <div class="servicio-3d-wrapper">
+                <h1 class="tituloContenedor3D">Mapa 3D</h1>
+                <div class="model-container" id="model-container"></div>
+                <a href="#" class="btn-sec2" id="btnContenedor3D">Ver proyecto completo</a>
+              </div>
+            </div>
             <div class="servicios__texto">
               <h2>MAPA 3D</h2>
               <h1>Explorar en 3D</h1>
@@ -159,8 +153,8 @@
     </section>
 
 
-    <!-- Nosotros -------------------------------------------------------------------------------------------------------(SEC 4)--->
-    <section class="panel panel-4" id="sec4">
+    <!-- Nosotros -------------------------------------------------------------------------------------------------------(SEC 3)--->
+    <section class="panel panel-3" id="sec3">
       <div class="circle-bg"></div>
       <div class="nosotros__contenido">
         <h1 class="title-aurora">Nosotros</h1>
@@ -175,16 +169,16 @@
         <p>Nuestra misión es ayudarte a <span class="highlight strong">destacar</span> frente a la <span class="highlight strong">competencia</span>, innovando con herramientas visuales impactantes que hacen que tu marca no solo se vea, sino que se recuerde.
         </p>
 
-        <a href="#" class="btn-sec4">Ver proyecto anterior</a>
+        <a href="#" class="btn-sec3">Ver proyecto anterior</a>
       </div>
       <a href="#" class="btn-next">↓</a>
     </section>
 
-    <!-- Nosotros 2 -----------------------------------------------------------------------------------------------------(SEC 5)--->
-    <section class="panel panel-5" id="sec5">
+    <!-- Nosotros 2 -----------------------------------------------------------------------------------------------------(SEC 4)--->
+    <section class="panel panel-4" id="sec4">
       
       <!-- FONDO FULL (solo se usa si GPU está activa) -->
-      <div class="sec5-bg-animated" id="sec5-full-bg">
+      <div class="sec4-bg-animated" id="sec4-full-bg">
         <svg xmlns="http://www.w3.org/2000/svg">                                     <!-- SVG invisible usado solo para definir el filtro gooey -->
           <defs>                                                                     <!-- <defs> almacena definiciones gráficas reutilizables como filtros -->
             <filter id="gooSec5">                                                    <!-- Filtro SVG que deforma y fusiona las burbujas creando el efecto "goo" -->
@@ -211,7 +205,7 @@
       </div>
 
       <!-- FONDO LIGERO (solo si NO hay GPU) -->
-      <div id="sec5-lite-bg"></div>
+      <div id="sec4-lite-bg"></div>
 
       <div class="content">
         <h1>Nuestro equipo</h1>
@@ -220,8 +214,8 @@
       </div>
     </section>
 
-    <!-- Contacto -------------------------------------------------------------------------------------------------------(SEC 6)--->
-    <section class="panel panel-6" id="sec6">
+    <!-- Contacto -------------------------------------------------------------------------------------------------------(SEC 5)--->
+    <section class="panel panel-5" id="sec5">
       
       <!-- Líneas animadas de fondo -->
       <svg class="flow-lines" viewBox="0 0 800 400" preserveAspectRatio="none">
@@ -290,9 +284,6 @@
   <div class="scroll-progress" aria-hidden="true">
     <div class="scroll-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
   </div>
-
-  <div id="overlay-3d-root"></div>
-
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script> 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
@@ -300,16 +291,16 @@
   <script type="module" src="../js/loader.js"></script>
 
   <script type="module" src="../js/main.js"></script>
+  <script type="module" src="../js/modelo3d.js"></script>
   <script type="module" src="../js/utilidades/conTab.js"></script>
   <script type="module" src="../js/navbar-mobile.js"></script>
 
   
   <script type="module" src="../../js/secciones/sec1-inicio.js"></script>
   <script type="module" src="../../js/secciones/sec2-servicios.js"></script>
-  <script type="module" src="../../js/secciones/sec3-modelo3d.js"></script>
-  <script type="module" src="../../js/secciones/sec4-nosotros.js"></script>
-  <script type="module" src="../../js/secciones/sec5-equipo.js"></script>
-  <script type="module" src="../../js/secciones/sec6-contacto.js"></script>
+  <script type="module" src="../../js/secciones/sec3-nosotros.js"></script>
+  <script type="module" src="../../js/secciones/sec4-equipo.js"></script>
+  <script type="module" src="../../js/secciones/sec5-contacto.js"></script>
 
 
 </body>
