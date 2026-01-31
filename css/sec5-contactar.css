@@ -1,0 +1,360 @@
+.panel-5 {
+  flex-direction: column;
+  padding: 3rem 2rem;
+}
+
+/* Líneas animadas del fondo */
+.panel-5 .flow-lines {
+  position: absolute;                                       /* Permite superponer líneas detrás del contenido */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+
+/* ------------------------- CONTENIDO PRINCIPAL ------------------------- */
+.panel-5 .contact-section {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+}
+
+.panel-5 .contact-title {
+  font-size: 2.8rem;
+  font-family: 'Instrument Sans', sans-serif;
+  background: linear-gradient(90deg, #7ED957, #c8e087);
+  -webkit-background-clip: text;                            /* Hace que el gradiente sea visible únicamente en el texto */
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.panel-5 .contact-desc {                                    /* Descripción bajo el título */
+  font-size: 1.2rem;
+  color: #ccc;
+  margin-bottom: 3rem;
+}
+
+/* ----------------------------- TARJETAS (botones) ----------------------------- */
+.panel-5 .contact-links {
+  display: flex;
+  flex-wrap: wrap;                                          /* Permite que las tarjetas salten de fila */
+  justify-content: center;
+  gap: 1.2rem;
+}
+
+.panel-5 .contact-card {                                    /* Tarjeta individual */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 160px;
+  border-radius: 16px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #fff;
+  transition: all 0.4s ease;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  overflow: hidden;                                         /* Oculta el gradiente que entra en hover */
+  transform: translateY(0) scale(1);
+  will-change: transform;
+}
+
+.panel-5 .contact-card i {                                  /* Ícono dentro de la tarjeta */
+  font-size: 2.6rem;
+  margin-bottom: 0.5rem;
+}
+
+/* ----------- GRADIENTE DE HOVER (capa superior animada) ----------- */
+.panel-5 .contact-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;                                                 /* Cubre toda la tarjeta */
+  background: linear-gradient(135deg, #7ED957, #95A472);
+  opacity: 0;                                               /* Invisible al inicio */
+  transition: opacity 0.4s ease;
+  z-index: 0;
+}
+.panel-5 .contact-card.gmail::before {
+  background: linear-gradient(135deg, #d95757, #a47272); /* Color mail */
+}
+.panel-5 .contact-card.facebook::before {
+  background: linear-gradient(135deg, #5764d9, #7277a4); /* Color facebook */
+}
+.panel-5 .contact-card.instagram::before {
+  background: linear-gradient(135deg, #ce57d9, #a472a1); /* Color instagam */
+}
+
+
+.panel-5 .contact-card:hover::before {                      /* Al pasar el mouse, la capa ::before se hace visible */
+  opacity: 0.9;
+}
+
+.panel-5 .contact-card span,                                /* Asegura que el texto e ícono queden encima del gradiente */
+.panel-5 .contact-card i {
+  position: relative;
+  z-index: 1;
+}
+
+.panel-5 .contact-card:hover {                              /* Animación de hover: subida + escalado */
+  transform: translateY(-8px) scale(1.05);
+  color: #000;
+}
+
+/* Colores de íconos */
+.panel-5 .contact-card.whatsapp i { color: #25D366; }
+.panel-5 .contact-card.gmail i { color: #EA4335; }
+.panel-5 .contact-card.facebook i { color: #0A66C2; }
+.panel-5 .contact-card.instagram i { color: #E1306C; }
+
+/* ----------------------------- FOOTER ----------------------------- */
+.panel-5 .contact-footer {
+  margin-top: 3rem;
+  font-size: 0.9rem;
+  color: #aaa;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.panel-5 .contact-footer i {
+  color: #7ED957;
+  margin-right: 0.3rem;
+}
+
+/* ============================================================================
+   MEDIA QUERIES: RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 1024px) {
+  .panel-5 .contact-title {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .panel-5 .contact-desc {
+    font-size: clamp(1rem, 3vw, 2.5rem);
+  }
+  .panel-5 .contact-footer {
+    font-size: clamp(0.7rem, 2.7vw, 2.2rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .panel-5 {
+    padding: 2rem 1.2rem;
+  }
+
+  .panel-5 .contact-title {
+    line-height: 1.2;
+  }
+
+  .panel-5 .contact-desc {
+    margin-bottom: 2rem;
+  }
+
+  .panel-5 .contact-card {
+    width: 45%;                                             /* 2 tarjetas por fila */
+    height: 110px;
+  }
+
+  .panel-5 .contact-footer {
+    margin-top: 2rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .panel-5 {
+    padding: 1.5rem 1rem;
+  }
+
+  .panel-5 .contact-section {
+    max-width: 100%;
+  }
+
+  .panel-5 .contact-title {
+    font-size: 1.8rem;
+  }
+
+  .panel-5 .contact-desc {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .panel-5 .contact-links {
+    gap: 0.8rem;
+  }
+
+  .panel-5 .contact-card {
+    width: 100%;                                            /* 1 tarjeta por fila */
+    height: 90px;
+  }
+
+  .panel-5 .contact-card i {
+    font-size: 2rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .panel-5 .contact-card span {
+    font-size: 0.9rem;
+  }
+
+  .panel-5 .contact-footer {
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 400px) and (max-height: 700px) {
+  .panel-5 {
+    padding-top: 2.8rem;
+    padding-bottom: 1.2rem;
+  }
+
+  .panel-5 .contact-title {
+    font-size: 1.7rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .panel-5 .contact-desc {
+    font-size: 0.85rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .panel-5 .contact-card {
+    height: 85px;
+  }
+
+  .panel-5 .contact-footer {
+    margin-top: 1rem;
+  }
+}
+
+/* ============================================================================
+   MODAL DE CONTACTO (EMAIL)
+   Sistema de modal del botón GMAIL en sec5-contacto
+   ============================================================================ */
+
+.mail-modal {                                               /* Fondo oscuro semi-transparente en toda la pantalla */
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: none;                                            /* Oculto por defecto */
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.mail-modal-content {                                       /* Caja principal del modal */
+  background: #111;
+  padding: 25px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 350px;
+  text-align: center;
+  position: relative;
+  animation: fadeIn 0.25s ease-out;
+  box-sizing: border-box;
+}
+
+.mail-modal-content h3 {                                    /* Título del modal */
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.mail-options {                                             /* Lista de botones de apps (Gmail, Outlook, Yahoo...) */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mail-options button {
+  padding: 12px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  font-size: 1rem;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.mail-options button:hover {
+  background: #272727;
+  transform: scale(1.03);
+}
+
+.close-modal {                                              /* Botón para cerrar (X) */
+  position: absolute;
+  right: 15px;
+  top: 12px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: white;
+}
+
+.close-modal::before {
+  content: "✕";
+  font-size: 1.3rem;
+  color: white;
+  font-weight: 600;
+}
+
+.modal-open {                                               /* Mantiene la barra de scroll visible mientras el modal está abierto */
+  overflow-y: scroll !important;
+}
+
+
+@keyframes fadeIn {                                         /* Animación del modal */
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* --------------------- Responsive del modal --------------------- */
+
+@media (max-width: 480px) {
+  .mail-modal-content {
+    padding: 20px;
+    max-width: 300px;
+  }
+
+  .mail-options button {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+
+  .mail-modal-content h3 {
+    font-size: 1.05rem;
+  }
+}
+
+/* ============================================================================
+   NOTIFICACIÓN “NÚMERO COPIADO”
+   ============================================================================ */
+
+.copy-notiTel {                                             /* Notificación “copiado” */
+  position: fixed;
+  bottom: 80px;                                             /* un poco arriba del footer */
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: #c8e087;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  opacity: 0;
+  pointer-events: none;                                     /* No interactúa con el usuario */
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 9999;
+}
+
+.copy-notiTel.show {                                        /* Estado visible */
+  opacity: 1;
+  transform: translateX(-50%) translateY(-8px);
+}
