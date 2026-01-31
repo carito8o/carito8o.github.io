@@ -5,12 +5,12 @@
   let indiceSeccionActual = (typeof window.getCurrentSection === 'function' ? window.getCurrentSection() : 0); // Índice de la sección visible actualmente (si existe una variable global "current", lo usa; si no, 0)
 
   const selectoresFocoPorSeccion = [                                                      // Lista de elementos que deben ser enfocados con tab en cada sección
-    ['#sec1 .btn-sec1'],                                                                  // Sección 1
+    ['.navbar a'],
+    ['#sec2 .servicios__col'],                                                            // Sección 2
     ['#model-container', '#sec2 .btn-sec2'],                                              // Sección 2
-    ['#sec3 .servicios__col'],                                                            // Sección 3
-    ['#sec4 .btn-sec4'],                                                                  // Sección 4
-    ['#sec5 .card__article'],                                                             // Sección 5
-    ['#sec6 .contact-card', '#sec6 button', '#sec6 a.contact-card']                       // Sección 6
+    ['#sec3 .btn-sec3'],                                                                  // Sección 3
+    ['#sec4 .card__article'],                                                             // Sección 4
+    ['#sec5 .contact-card', '#sec5 button', '#sec5 a.contact-card']                       // Sección 5
   ]; 
 
   function establecerTabindex(elemento, valor) {                                          // Función auxiliar para aplicar tabindex a un elemento
@@ -34,7 +34,8 @@
     '.card__article',                                                                     // Desde aqui van los elementos específicos navegables...
     '.servicios__col',
     '#model-container',
-    '.btn-sec1', '.btn-sec2', '.btn-sec4',
+    '.navbar a',
+    '.btn-sec2', '.btn-sec4',
     '.contact-card', '#sec6 a.contact-card'
   ];
 
@@ -60,8 +61,8 @@
     });
 
     // Caso especial para Sección 5 (cartas) ---------
-    const cartas = Array.from(document.querySelectorAll('#sec5 .card__article'));
-    if (indice === 4) {                                                                   // Si estamos en la sección 5...
+    const cartas = Array.from(document.querySelectorAll('#sec4 .card__article'));
+    if (indice === 3) {                                                                   // Si estamos en la sección 4...
       cartas.forEach(c => establecerTabindex(c, '0'));                                    // Las cartas deben ser navegables con TAB → tabindex=0
     } else {
       cartas.forEach(c => {
@@ -81,12 +82,12 @@
   }
 
   // ----------------------------------------------------------------
-  // Sección 3: servicios
+  // Sección 2: servicios
   // ----------------------------------------------------------------
   // Hace que cada columna de servicios sea accesible con teclado, se pueda abrir/cerrar con ENTER y que solo una esté abierta a la vez
 
   function inicializarServicios() {
-    const columnas = document.querySelectorAll('#sec3 .servicios__col');
+    const columnas = document.querySelectorAll('#sec2 .servicios__col');
     let abiertoPorTeclado = null;                                                         // Guarda la columna que fue abierta mediante teclado (Enter)
 
     document.addEventListener('mousemove', () => {                                        // Cierre por mouse en un único listener global
@@ -145,16 +146,16 @@
   }
 
   // ----------------------------------------------------------------
-  // Sección 5: cartas
+  // Sección 4: cartas
   // ----------------------------------------------------------------
 
   function inicializarCartas() {
     const contenedor = document.getElementById('cards-container') ||                      // Busca el contenedor principal de las cartas en varias ubicaciones posibles
-                      document.querySelector('#sec5 .card__container') ||
-                      document.querySelector('#sec5');
+                      document.querySelector('#sec4 .card__container') ||
+                      document.querySelector('#sec4');
     if (!contenedor) return;
 
-    const selectorTodasCartas = '#sec5 .card__article';                                   // Selector que representa cada tarjeta
+    const selectorTodasCartas = '#sec4 .card__article';                                   // Selector que representa cada tarjeta
     const obtenerTodasCartas = () => Array.from(document.querySelectorAll(selectorTodasCartas)); // Array con todas esas cartas
 
     function fijarTabindexInterno(articulo, valor) {                                      // Cambia tabindex de botones internos (en info, redes sociales)
@@ -302,13 +303,13 @@
     const ultimo = tabbables[tabbables.length - 1];                                       // Último tabbable de la sección
 
 
-    // manejo especial para sección 5 (cartas) ----------------
+    // manejo especial para sección 4 (cartas) ----------------
 
     // Esta sección requiere lógica especial porque una carta puede tener elementos propios internos que solo son tabbables si la carta está abierta
 
-    if (indiceSeccionActual === 4) {                                                      // Estamos en sección 5
-      const cartaAbierta = document.querySelector('#sec5 .card__article.open-by-keyboard, #sec5 .card__article.show-info'); // Busca una carta abierta
-      const todasCartas = Array.from(document.querySelectorAll('#sec5 .card__article'));
+    if (indiceSeccionActual === 3) {                                                      // Estamos en sección 4
+      const cartaAbierta = document.querySelector('#sec4 .card__article.open-by-keyboard, #sec4 .card__article.show-info'); // Busca una carta abierta
+      const todasCartas = Array.from(document.querySelectorAll('#sec4 .card__article'));
 
       if (cartaAbierta && cartaAbierta.contains(actual)) {                                // Si existe una carta abierta y el foco actual está dentro de ella
         const internos = Array.from(cartaAbierta.querySelectorAll(selectorTabbables)).filter(el => { // Buscar elementos tabbables dentro de esa carta
@@ -391,7 +392,7 @@
   });
 
   // ----------------------------------------------------------------
-  // Sección 2: accesibilidad del contenedor del modelo 3D
+  // Sección 3: accesibilidad del contenedor del modelo 3D
   // ----------------------------------------------------------------
   
   function configurarContenedorModelo() {
@@ -516,7 +517,7 @@
       return focos;
     }
 
-    // ESCUCHAR: cuando sec6-contacto.js abre un modal, dispara "modal-abierto"
+    // ESCUCHAR: cuando sec5-contacto.js abre un modal, dispara "modal-abierto"
     window.addEventListener("modal-abierto", e => {
       modalAbierto = e.detail.modal;
       focusRoot = e.detail.focusRoot;
