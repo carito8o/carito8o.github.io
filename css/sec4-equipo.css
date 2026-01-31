@@ -1,0 +1,361 @@
+/*================================================================= sec4 =================================================================*/
+
+#sec4 {
+  font-family: "Montserrat Alternates", serif;
+}
+
+#sec4 img {                                          /* Imágenes siempre adaptadas al contenedor */
+  display: block; 
+  max-width: 100%; 
+  height: auto; 
+}
+
+#sec4 h1 {                                           /* Título con otra tipografía */
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: clamp(3rem, 7vw, 4.4rem); 
+  margin-bottom: .3rem;
+}
+
+
+/* ----- CONTENEDOR DE CARTAS ----- */
+#sec4 .card__container {
+  display: grid;                                     /* Para crear filas y columnas con las cartas */
+  grid-template-columns: repeat(4, 1fr);             /* 4 columnas en PC */
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  max-width: min(1200px, 92vw);
+  margin: 0 auto;                                    /* Centrado horizontal */
+}
+
+
+/* ----- CARTA ----- */
+
+#sec4 .card__article {
+  position: relative;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  perspective: 1200px;                               /* Necesario para efecto 3D */
+  transform-style: preserve-3d;                      /* Mantiene profundidad 3D */
+  will-change: transform;                            /* Optimiza animación */
+  transition: box-shadow 260ms ease;
+}
+
+/* wrapper que evita que el glare se salga */
+#sec4 .tilt-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;                                  /* Corta el brillo dentro */
+  border-radius: inherit;                            /* Igual que el que tenga la carta (su elemento padre) */
+  transform-style: preserve-3d;
+}
+
+/* el glare debe estar DENTRO del wrapper */
+.tilt-wrapper .reflejo-brillante {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 140%; height: 140%;                         /* Mucho más grande para cubrir toda la carta */
+  z-index: 50;
+  pointer-events: none;                              /* No bloquea clicks */
+  transform: translate(-50%, -50%) rotate(45deg) scale(1);
+  background: radial-gradient(
+    circle at center, 
+    rgba(255,255,255,0.35), 
+    rgba(255,255,255,0.18) 20%, 
+    transparent 45%
+  );
+  opacity: 0;                                        /* Invisible hasta activar */
+  mix-blend-mode: screen;                            /* Hace que el glare se mezcle con la tarjeta produciendo un efecto de luz realista, como si el brillo estuviera afectando al material de la tarjeta */
+  filter: blur(14px);                                /* Suaviza brillo */
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+
+
+#sec4 .card__img {
+  border-radius: inherit;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;                       /* Oculta reverso en transformaciones, porque como la img ahora es como un elemento 3d, podria verse la parte de atras y ocasionar un glitch */
+  transition: transform .4s;
+}
+
+
+/* Sombra inferior para efecto visual */
+#sec4 .card__shadow {
+  position: absolute;
+  inset: 0;                                          /* Ocupa todo el espacio de la tarjeta */ /* Significa que top, right, bottom y left son 0 */
+  background: linear-gradient(180deg, transparent 70%, #000 100%);
+}
+
+/* Carta se levanta en PC */
+@media (hover: hover) and (pointer: fine) {
+  #sec4 .card__article {
+    transition: transform .35s ease, box-shadow .35s ease;
+  }
+
+  #sec4 .card__article:hover {
+    box-shadow: 0 20px 40px rgba(0,0,0,.28);
+  }
+}
+
+
+
+/* ----- DATOS (nombre - profesion) ----- */
+
+#sec4 .card__data {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  text-align: left;
+}
+#sec4 .card__name { 
+  font-size: clamp(1.1rem, 1.8vw + 0.5rem, 2.1rem);
+  margin-bottom: .25rem; 
+}
+
+#sec4 .card__profession { 
+  font-size: clamp(0.75rem, 1.2vw + 0.3rem, 1.1rem); 
+}
+
+/* ----- ICONO CLIP ----- */
+
+#sec4 .card__clip {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  width: 2rem; height: 2rem;
+  border-radius: 50%;
+  display: grid; place-items: center;                /* Centra ícono */
+
+  background: linear-gradient(135deg, #7ED957, #c8e087);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.5); 
+  color: #000;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform .4s ease;
+  z-index: 10;
+}
+
+/* OCULTAR clip en PC */
+@media (hover: hover) and (pointer: fine) {
+  #sec4 .card__clip {
+    display: none !important;
+  }
+}
+
+
+/* ----- PANEL INFO ----- */
+
+#sec4 .info {
+  position: absolute;
+  inset: 0;                                          /* Panel cubre toda la tarjeta */
+  padding: clamp(1rem, 2.5vw, 2rem);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+
+  background: hsla(0, 0%, 0%, .1);                 /* Negro transparente */
+  backdrop-filter: blur(12px);                       /* Efecto de vidrio */
+  -webkit-backdrop-filter: blur(12px);               /* NECESARIO para iPhone */
+
+  clip-path: circle(0px at 88% 9%);                  /* Comienza cerrado */
+  transition: clip-path .5s ease-in-out;             /* Apertura suave */
+  z-index: 5;
+
+  transform: translate3d(0,0,1px);                   /* ARREGLA EL BUG */
+  backface-visibility: hidden;
+  will-change: backdrop-filter, clip-path;           /* Fuerza a Safari a recomponer bien */
+}
+
+#sec4 .info__data {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+#sec4 .info__name { 
+  font-size: clamp(1.1rem, 3vw, 2.2rem); 
+  margin-bottom: .5rem; 
+}
+
+#sec4 .info__description { 
+  font-size: clamp(0.8rem, 2vw, 1rem); 
+  margin-bottom: 1rem; 
+}
+
+/* Permite que el texto no colapse al reducir tamaño */
+#sec4 .info__name,
+#sec4 .info__description {
+  word-wrap: break-word;
+}
+
+/* Solo activar hover en dispositivos NO táctiles */
+@media (hover: hover) and (pointer: fine) {
+  #sec4 .info:hover,
+  #sec4 .card__clip:hover ~ .info {
+    clip-path: circle(100%);
+  }
+}
+
+/* Abrir info al hacer hover en la carta (solo PC) */
+@media (hover: hover) and (pointer: fine) {
+  #sec4 .card__article:hover .info {
+    clip-path: circle(120%);
+    pointer-events: auto;                            /* Ya se puede hacer clic adentro */
+  }
+}
+
+
+/* ----- REDES SOCIALES ----- */
+
+#sec4 .info__social {
+  margin-top: auto;
+  position: static;
+  display: flex; gap: .5rem;
+  justify-content: center;
+}
+#sec4 .info__link {
+  background-color: rgba(200, 224, 135, 0.7);
+  width: clamp(24px, 6vw, 40px);
+  height: clamp(24px, 6vw, 40px);
+  font-size: clamp(1rem, 3.5vw, 1.8rem);
+  border-radius: .75rem;
+
+  display: flex;
+  align-items: center;      /* centrado vertical */
+  justify-content: center;  /* centrado horizontal */
+
+  color: #000;
+  transition: transform .4s;
+}
+
+#sec4 .info__link i {
+  display: block;                                    /* fuerza al icono a ocupar solo su contenido */
+  line-height: 1;
+}
+
+
+
+
+/* ============================================================ */
+
+/* Hover solo en PC */
+@media (hover: hover) and (pointer: fine) {
+  #sec4 .info__link:hover { 
+    transform: translateY(-.25rem); 
+  }
+}
+
+/* Oculta el icono si está abierto por teclado o por clip */
+@media (pointer: coarse) {
+  #sec4 .card__article.open-by-keyboard .card__clip,
+  #sec4 .card__article.show-info .card__clip {
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+
+/* ==================== PARA QUE FUNCIONE CON TAB ==================== */
+
+/* Abrir .info cuando la carta tiene la clase (activación por teclado/JS) */
+#sec4 .card__article.open-by-keyboard .info,
+#sec4 .card__article.show-info .info {
+  clip-path: circle(120%);
+  pointer-events: auto;
+}
+
+/* ----------------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+  #sec4 .card__container {
+    grid-template-columns: 1fr 1fr;                  /* 2 columnas */
+  }
+
+  #sec4 .card__clip {
+    width: clamp(40px, 7vw, 80px);
+    height: clamp(40px, 7vw, 80px);
+    font-size: clamp(1.8rem, 3.8vw, 3.5rem);
+  }
+
+  #sec4 .info__social {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+}
+
+@media (min-width: 640px) and (max-width: 1024px) and (min-height: 850px) {
+  #sec4 .card__container {
+    max-width: min(860px, 75vw);
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1200px) {
+  #sec4 .info__name { 
+  font-size: clamp(1rem, 2.5vw, 2.2rem); 
+}
+  #sec4 .info__link {
+    width: clamp(17px, 4vw, 40px);
+    height: clamp(1px, 0.8vw, 35px);
+    font-size: clamp(0.5rem, 2.3vw, 1.2rem);
+  }
+}
+
+@media (min-width: 400px) and (max-width: 1024px) {
+  #sec4 .info__name { 
+  font-size: clamp(1.1rem, 5vw, 2.3rem); 
+}
+
+#sec4 .info__description { 
+  font-size: clamp(0.8rem, 2.4vw, 1.3rem);
+}
+}
+
+
+@media (max-width: 360px) {
+  #sec4 h1 { display: none; }                        /* Oculta título para espacio */
+
+  #sec4 .card__container {
+    grid-template-columns: 1fr;
+    margin-top: 3vw;
+  }
+
+  #sec4 .card__article {
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  #sec4 .card__clip {
+    width: clamp(30px, 10vw, 50px);
+    height: clamp(30px, 10vw, 50px);
+    font-size: clamp(1.2rem, 3.4vw, 2rem);
+  }
+
+}
+
+/* ----------- PANTALLAS ALTAS Y ESTRECHAS (Galaxy Z Fold / S8) ----------- */
+@media screen and (max-width: 400px) and (min-height: 740px) {
+  #sec4 h1 { display: none; }
+ #sec4 .card__container {
+    grid-template-columns: 1fr;
+    margin-top: 3vw;
+  }
+
+  #sec4 .card__article {
+    width: 50%;
+    margin: 0 auto;
+  }
+
+  #sec4 .info__name { display: none; }
+
+  #sec4 .info__description { 
+  font-size: clamp(0.7rem, 3.5vw, 1rem); 
+}
+  
+  #sec4 .info__link {
+    width: clamp(25px, 5.5vw, 40px);
+    height: clamp(25px, 5.5vw, 40px);
+    font-size: clamp(1.1rem, 3.3vw, 1.5rem);
+  }
+}
