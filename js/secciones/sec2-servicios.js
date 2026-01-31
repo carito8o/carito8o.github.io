@@ -1,4 +1,5 @@
 import gsap from "gsap";
+import { isTouchDevice, isMobileSize } from "../utilidades/detectarDispositivo.js"; 
 
 export function initSec2() {
 
@@ -6,7 +7,8 @@ export function initSec2() {
   if (!sec2) return;                                                   // Todo este archivo nada mas funciona si el usuario esta en la seccion 2
 
   const cols = sec2.querySelectorAll(".servicios__col");               // Todas las columnas de servicios
-  const isMobile = window.matchMedia("(pointer: coarse)").matches;
+  const IS_TOUCH = isTouchDevice();
+  const isMobile = isMobileSize();
 
   /* ======================================================
      ANIMACIONES DE ENTRADA (PC / MOBILE)
@@ -94,22 +96,22 @@ export function initSec2() {
   let estado = null;                                                   // Guarda qué servicio está abierto ("izq", "der" o null)
   let animando = false;                                                // Evita que se ejecuten animaciones simultáneas
 
-  function animarBoton(btn) {
-  gsap.fromTo(
-    btn,
-    { scale: 1 },
-    {
-      scale: 1.12,
-      duration: 0.15,
-      ease: "back.out(2.5)",
-      yoyo: true,
-      repeat: 1
-    }
-  );
-}
+  function animarBoton(btn) { // ---------------------------- ANIMACIÓN REBOTE BOTON
+    gsap.fromTo(
+      btn,
+      { scale: 1 },
+      {
+        scale: 1.12,
+        duration: 0.15,
+        ease: "back.out(2.5)",
+        yoyo: true,
+        repeat: 1
+      }
+    );
+  }
 
+  function abrir(lado) { // --------------------------------- ABRIR EXPANSIÓN
 
-  function abrir(lado) {
     if (animando || estado) return;                                    // Si ya hay una animación en curso o un servicio abierto, no se hace nada
     animando = true;
     estado = lado;
@@ -125,8 +127,8 @@ export function initSec2() {
         duration: 0.7,
         ease: "power3.inOut",
         onStart: () => {
-    expandIzq.style.pointerEvents = "auto"; // 🔑 AHORA SÍ recibe clicks
-  },
+          expandIzq.style.pointerEvents = "auto";                      // ahora si recibe clicks la expansión
+        },
         onComplete: () => {
           der.style.pointerEvents = "none";                            // Desactiva interacción del servicio contrario
           animando = false;
@@ -144,8 +146,8 @@ export function initSec2() {
         duration: 0.7,
         ease: "power3.inOut",
         onStart: () => {
-    expandDer.style.pointerEvents = "auto"; // 🔑 AHORA SÍ recibe clicks
-  },
+          expandDer.style.pointerEvents = "auto";
+        },
         onComplete: () => {
           izq.style.pointerEvents = "none";
           animando = false;
@@ -154,7 +156,8 @@ export function initSec2() {
     }
   }
 
-  function cerrar() {
+  function cerrar() { // ------------------------------------ CERRAR EXPANSIÓN
+
     if (animando || !estado) return;                                   // Si no hay servicio abierto o hay animación en curso, no hace nada
     animando = true;
 
@@ -166,9 +169,9 @@ export function initSec2() {
       clipPath: "inset(0 100% 0 0)",                                   // se oculta hacia la derecha. Recorta el 100% del ancho desde la derecha hacia adentro
       duration: 0.6,
       ease: "power3.inOut",
-  onComplete: () => {
-    expandIzq.style.pointerEvents = "none"; // 🔒 vuelve a bloquear
-  }
+      onComplete: () => {
+        expandIzq.style.pointerEvents = "none";                        // Vuelve a bloquear
+      }
     });
 
     gsap.to(expandDer, {                                               // Cierra la expansión derecha
@@ -184,10 +187,57 @@ export function initSec2() {
       onComplete: () => {
         estado = null;
         animando = false;
-        expandDer.style.pointerEvents = "none"; // 🔒 vuelve a bloquear
+        expandDer.style.pointerEvents = "none";
       }
     });
   }
+
+  // -------------------------------------------------------- LA EXPANSION DE SERVICIO 3D SE EXPANDE A TODA LA PANTALLA POR EL MODELO 3D
+
+  let fullScreen3D = false;                                            // flag temporal para indicar que el 3D ocupa toda la sección
+  const txtInferior = document.querySelector('.sec2__txtInferior');
+
+  function expandir3DFullscreen() {
+    if (animando || estado !== "izq" || fullScreen3D || (window.is3DTransitioning && window.is3DTransitioning())) return;
+
+    animando = true;
+    fullScreen3D = true;
+
+    gsap.to(expandIzq, {
+      width: "100vw",
+      left: "0",
+      duration: 0.7,
+      ease: "power3.inOut",
+      onStart: () => {
+        txtInferior.style.display = 'none';
+      },
+      onComplete: () => {
+        animando = false;
+      }
+    });
+  }
+
+  function restaurar3DMitad() {
+    if (animando || !fullScreen3D) return;
+
+    animando = true;
+    fullScreen3D = false;
+
+    gsap.to(expandIzq, {
+      width: "50vw",
+      left: "100%",
+      duration: 0.6,
+      ease: "power3.inOut",
+      onStart: () => {
+        txtInferior.style.display = '';
+      },
+      onComplete: () => {
+        animando = false;
+      }
+    });
+  }
+
+  /* ======================== EVENTOS ======================== */
 
   btnIzq.addEventListener("click", e => {                              // Click en botón izquierdo
     e.preventDefault();                                                // Evita el comportamiento por defecto del <a>
@@ -198,5 +248,22 @@ export function initSec2() {
     e.preventDefault();
     estado === "der" ? cerrar() : abrir("der");
   });
-}
 
+  const modelContainer = document.getElementById("model-container");
+
+  if (modelContainer) {
+    modelContainer.addEventListener("click", () => {
+      expandir3DFullscreen();
+    });
+  }
+  window.restaurar3DMitad = restaurar3DMitad;
+
+  window.addEventListener("sectionChange", (e) => {                    // En computadores (sistema snap on scroll), cierra la expansión cuando se cambia de sección
+    const index = e.detail.current;
+    if (index !== 1 && !IS_TOUCH) {                                    // Si estamos en la sección 0 (la primera) y NO es móvil
+      cerrar();
+    }
+  });
+
+  window.is3DPanelFullscreen = () => fullScreen3D === true;            // Función global que devuelve el estado real del panel 3D (fullscreen o no). modelo3d.js la consulta para saber si el modelo 3D tiene permiso de expandirse
+}
