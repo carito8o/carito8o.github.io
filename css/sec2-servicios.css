@@ -50,6 +50,7 @@
   object-fit: cover;
   object-position: bottom;
   pointer-events: none;
+  user-select: none;
   
   transform: translateZ(0); /* Evita que la imagen del 360 se vea mal renderizada */
   will-change: transform;
@@ -255,4 +256,13 @@
   background: rgb(241, 83, 83);
 }
 
+.servicio-expandido--3d {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.servicio-expandido--3d {
+  isolation: isolate;
+}
 
