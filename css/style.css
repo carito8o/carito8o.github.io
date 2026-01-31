@@ -57,11 +57,10 @@ body.no-scroll {
 }
 
 /* Fondo de cada seccion */
-.panel-3 { background: linear-gradient(135deg, #95A472, #79b95d); color: #fff; }
 .panel-2 { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #fff; }
-.panel-4 { background: #111; color: #fff; }
-.panel-5 { background: linear-gradient(135deg, #8f9e6b, #4f8339); color: #fff; }
-.panel-6 { background: linear-gradient(135deg, #0a0a0a 0%, #0f1f0f 100%); color: #fff; }
+.panel-3 { background: #111; color: #fff; }
+.panel-4 { background: linear-gradient(135deg, #8f9e6b, #4f8339); color: #fff; }
+.panel-5 { background: linear-gradient(135deg, #0a0a0a 0%, #0f1f0f 100%); color: #fff; }
 
 /* ======================== DESACTIVAR SNAP EN MÓVILES ======================== */
 @media (pointer: coarse) {
@@ -301,7 +300,7 @@ body.no-scroll {
 
 .scroll-progress-bar {
   height: 100%;
-  width: 0; /* empieza vacía */
+  width: 0;                                                 /* empieza vacía */
   background: #7ED957;
   border-radius: 5px;
   transition: width 0.2s linear;                            /* Animación suave al actualizar */
@@ -314,7 +313,4 @@ body.no-scroll {
   .navbar ul { font-size: 60%; gap: 1px; }
   .page-border {border: 7px solid}
 }
-
-
-
 
