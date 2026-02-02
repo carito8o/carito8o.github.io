@@ -156,9 +156,11 @@ export function initSec2() {
     }
   }
 
-  function cerrar() { // ------------------------------------ CERRAR EXPANSIÓN
+  function cerrar(forzado = false) { // ------------------------------------ CERRAR EXPANSIÓN
 
-    if (animando || !estado) return;                                   // Si no hay servicio abierto o hay animación en curso, no hace nada
+    // forzado siempre será false, excepto en sectionChange para permitir interrumpir animaciones en curso y limpiar el estado visual
+    if (!forzado && (animando || !estado)) return;                     // 1. Si no es forzado Y 2. Si no hay servicio abierto o hay animación en curso... no hace nada
+                                                                       
     animando = true;
 
     // Reactiva interacción en ambos servicios
@@ -258,10 +260,12 @@ export function initSec2() {
   }
   window.restaurar3DMitad = restaurar3DMitad;
 
-  window.addEventListener("sectionChange", (e) => {                    // En computadores (sistema snap on scroll), cierra la expansión cuando se cambia de sección
+  window.addEventListener("sectionChange", (e) => {                    // En desktop (sistema snap on scroll), al salir de la sección, se fuerza el cierre de expansión de los servicios
     const index = e.detail.current;
-    if (index !== 1 && !IS_TOUCH) {                                    // Si estamos en la sección 0 (la primera) y NO es móvil
-      cerrar();
+    if (index !== 1 && !IS_TOUCH) {                                    // Si no estamos en el indice 1 (sec2) y NO es móvil...
+      gsap.killTweensOf([expandIzq, expandDer]);                       // Interrumpe y cancela animaciones en curso
+      fullScreen3D = false;                                            // Limpia estado de fullscreen 3D
+      cerrar(true);                                                    // Cierre forzado con true (ignora flags de animación)
     }
   });
 
