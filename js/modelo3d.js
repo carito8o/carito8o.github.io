@@ -122,7 +122,7 @@ export function initModelo3d() {
       }
     });
   }
-  window.reset3DCamera = resetCamera;
+  window.reset3DCamera = resetCamera;                                          // Para que se pueda reiniciar desde main.js al cambiar de sección
 
 
 
@@ -168,8 +168,6 @@ export function initModelo3d() {
   function animate() {
     if (!isVisible) return;
     animationId = requestAnimationFrame(animate);
-
-    controls.enabled = expanded;                                               // Bloquea interacción si está colapsado
 
     if (expanded || activeRender) {                                            // Render continuo si el contenedor está expandido
       controls.update();
@@ -247,8 +245,8 @@ export function initModelo3d() {
     isTransitioning = true;
     expanded = true;
     activeRender = true;
-    controls.autoRotate = true;
-    controls.enabled = true;
+    controls.enabled = false;
+    controls.autoRotate = false;
     controls.update();
 
     animate();                                                                 // asegurar render continuo
@@ -273,10 +271,11 @@ export function initModelo3d() {
       ease: "power2.inOut",
       onUpdate: () => {
         resizeRenderer();
-        renderer.render(scene, camera);                                        // fuerza render durante la animación
       },
       onComplete: () => {
         isTransitioning = false;                                               // libera
+        controls.enabled = true;
+        controls.autoRotate = true;
       }
     });
 
